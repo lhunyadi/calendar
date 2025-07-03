@@ -1,0 +1,29 @@
+/* PLEASE NOTE: THESE TAILWIND IMPORTS SHOULD NEVER BE DELETED */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* DO NOT DELETE THESE TAILWIND IMPORTS, OTHERWISE THE STYLING WILL NOT RENDER AT ALL */
+
+/* Dark scrollbar styling for calendar views */
+.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: #ffffff #2C2D30;
+}
+
+.overflow-y-auto::-webkit-scrollbar {
+  width: 12px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: #2C2D30;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #ffffff;
+  border-radius: 6px;
+  border: 2px solid #2C2D30;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #e5e5e5;
+}
