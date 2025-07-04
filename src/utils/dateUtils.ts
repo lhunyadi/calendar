@@ -97,6 +97,12 @@ export const format = (date: Date, formatStr: string): string => {
   if (formatStr === 'd') {
     return date.getDate().toString()
   }
+  if (formatStr === 'MMMM') {
+    return months[date.getMonth()]
+  }
+  if (formatStr === 'yyyy') {
+    return date.getFullYear().toString()
+  }
   if (formatStr === 'MMMM yyyy') {
     return `${months[date.getMonth()]} ${date.getFullYear()}`
   }
