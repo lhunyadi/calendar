@@ -22,6 +22,7 @@ interface ThemeContextType {
   getCalendarInMonthColor: () => string
   getCalendarOutMonthColor: () => string
   getHoverColor: () => string
+  getTodayTextColor: () => string
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
@@ -91,13 +92,15 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     return themeMode === 'dark' ? '#222529' : '#fafafa' // brand-medium : brand-light
   }
 
-  // Hover color function that works consistently in both themes
+  // Hover color function that uses a consistent light blue across all themes
   const getHoverColor = (): string => {
-    const baseColor = getColorHex()
-    // In light mode, use much lighter opacity to avoid dark ugly color
-    // In dark mode, use standard opacity for the nice light effect
-    const opacity = themeMode === 'dark' ? '40' : '20' // 25% vs 12.5% opacity
-    return `${baseColor}${opacity}`
+    // Use a consistent light blue hover color regardless of theme or brand color
+    return '#36C5F030' // Light blue with 30 opacity - matches the blue from screenshot
+  }
+
+  // Get contrasting text color for today highlights - opposite of theme
+  const getTodayTextColor = (): string => {
+    return themeMode === 'dark' ? '#1A1D21' : '#ffffff' // brand-black : brand-white
   }
 
   const value = useMemo(() => ({
@@ -115,7 +118,8 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     getSurfaceColorClass,
     getCalendarInMonthColor,
     getCalendarOutMonthColor,
-    getHoverColor
+    getHoverColor,
+    getTodayTextColor
   }), [currentColor, themeMode])
 
   return (

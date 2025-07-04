@@ -36,7 +36,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
   onDateClick,
   onDayHeaderClick,
 }) => {
-  const { getColorHex, getBgColor, getCalendarOutMonthColor, getTextColor, themeMode, getHoverColor } = useTheme()
+  const { getColorHex, getBgColor, getCalendarOutMonthColor, getTextColor, themeMode, getHoverColor, getTodayTextColor } = useTheme()
   
   const isWeekend = (date: Date): boolean => {
     const day = date.getDay()
@@ -218,7 +218,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
                 className={`text-sm ${isSameDay(day, new Date()) ? 'rounded-full w-6 h-6 flex items-center justify-center' : ''}`}
                 style={
                   isSameDay(day, new Date()) 
-                    ? { backgroundColor: currentColor, color: '#ffffff' }  // White text on highlight background
+                    ? { backgroundColor: currentColor, color: getTodayTextColor() }  // Use theme-aware text color
                     : {}
                 }
               >
