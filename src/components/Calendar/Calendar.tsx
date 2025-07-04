@@ -40,7 +40,13 @@ export const Calendar: React.FC<CalendarProps> = ({ events }) => {
   }
 
   const handleDayHeaderClick = (date: Date) => {
-    setSelectedColumn(date.getDay()) // Select entire column
+    const dayOfWeek = date.getDay()
+    // Toggle column selection: if same column is clicked, deselect it
+    if (selectedColumn === dayOfWeek) {
+      setSelectedColumn(null) // Deselect if clicking the same column
+    } else {
+      setSelectedColumn(dayOfWeek) // Select new column
+    }
     setSelectedDate(null) // Clear individual day selection
   }
 
