@@ -4,15 +4,20 @@ import { useTheme, type BrandColor } from '../../contexts/ThemeContext'
 interface ColorPaletteProps {
   isOpen: boolean
   onClose: () => void
+  paletteButtonRef?: React.RefObject<HTMLButtonElement | null>
 }
 
-export const ColorPalette: React.FC<ColorPaletteProps> = ({ isOpen, onClose }) => {
-  const { currentColor, setCurrentColor, colorOptions } = useTheme()
+export const ColorPalette: React.FC<ColorPaletteProps> = ({ isOpen, onClose, paletteButtonRef }) => {
+  const { currentColor, setCurrentColor, colorOptions, themeMode } = useTheme()
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
+      const target = event.target as Node
+      const isClickInsidePalette = ref.current?.contains(target)
+      const isClickOnPaletteButton = paletteButtonRef?.current?.contains(target)
+      
+      if (!isClickInsidePalette && !isClickOnPaletteButton) {
         onClose()
       }
     }
@@ -24,7 +29,7 @@ export const ColorPalette: React.FC<ColorPaletteProps> = ({ isOpen, onClose }) =
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
-  }, [isOpen, onClose])
+  }, [isOpen, onClose, paletteButtonRef])
 
   if (!isOpen) return null
 
@@ -33,51 +38,36 @@ export const ColorPalette: React.FC<ColorPaletteProps> = ({ isOpen, onClose }) =
     onClose()
   }
 
-  const getColorName = (color: BrandColor): string => {
-    const nameMap: Record<BrandColor, string> = {
-      'brand-blue': 'Blue',
-      'brand-yellow': 'Yellow',
-      'brand-green': 'Green',
-      'brand-red': 'Red',
-      'brand-aubergine': 'Aubergine'
-    }
-    return nameMap[color]
-  }
-
   const getColorValue = (color: BrandColor): string => {
     const colorMap: Record<BrandColor, string> = {
       'brand-blue': '#36C5F0',
       'brand-yellow': '#ECB22E',
       'brand-green': '#2EB67D',
-      'brand-red': '#E01E5A',
-      'brand-aubergine': '#4A154B'
+      'brand-red': '#E01E5A'
     }
     return colorMap[color]
   }
 
   return (
-    <div ref={ref} className="absolute top-full right-0 mt-2 bg-[#19171D] border border-[#2C2D30] rounded-lg shadow-lg p-3 z-50 min-w-[200px]">
-      <h3 className="text-sm font-medium text-white mb-2">Choose Theme Color</h3>
-      <div className="space-y-2">
-        {colorOptions.map((color) => (
+    <div ref={ref} className="flex items-center space-x-2">
+      {colorOptions.map((color) => {
+        const ringColor = themeMode === 'dark' ? '#ffffff' : '#000000' // brand-white in dark, brand-black in light
+        return (
           <button
             key={color}
             onClick={() => handleColorSelect(color)}
-            className={`w-full flex items-center space-x-3 p-2 rounded hover:bg-[#2C2D30] transition-colors ${
-              currentColor === color ? 'bg-[#2C2D30]' : ''
+            className={`p-1 rounded-full transition-all hover:scale-110 ${
+              currentColor === color ? 'ring-2 ring-offset-1 ring-offset-transparent' : ''
             }`}
+            style={currentColor === color ? { '--tw-ring-color': ringColor } as React.CSSProperties : {}}
           >
             <div
-              className="w-4 h-4 rounded-full border border-[#444]"
+              className="w-4 h-4 rounded-full"
               style={{ backgroundColor: getColorValue(color) }}
             />
-            <span className="text-sm text-[#D1D2D3]">{getColorName(color)}</span>
-            {currentColor === color && (
-              <div className="ml-auto w-2 h-2 rounded-full bg-white" />
-            )}
           </button>
-        ))}
-      </div>
+        )
+      })}
     </div>
   )
 }

@@ -141,19 +141,19 @@ export const WeekView: React.FC<WeekViewProps> = ({
             return (
               <div
                 key={day.toString()}
-                className={`p-3 text-center cursor-pointer hover:!bg-[#4A154B]/25 transition-colors bg-[#1A1D21] ${
-                  isSelected(day) ? 'border-t-2 border-t-[#4A154B]' : ''
-                } ${isSelectedColumn ? 'border-t border-[#4A154B]' : ''}`}
+                className={`p-3 text-center cursor-pointer hover:!bg-[#36C5F0]/25 transition-colors bg-[#1A1D21] ${
+                  isSelected(day) ? 'border-t-2 border-t-[#36C5F0]' : ''
+                } ${isSelectedColumn ? 'border-t border-[#36C5F0]' : ''}`}
                 onClick={() => onDayHeaderClick(day)}
               >
                 <div className={`text-sm mb-1 ${
-                  isToday(day) ? 'text-[#4A154B]' : 'text-[#8D8D8D]'
+                  isToday(day) ? 'text-[#36C5F0]' : 'text-[#8D8D8D]'
                 }`}>
                   {format(day, 'EEEE')}
                 </div>
                 <div className={`text-lg font-medium ${
                   isToday(day) 
-                    ? 'bg-[#4A154B] text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto' 
+                    ? 'bg-[#36C5F0] text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto' 
                     : 'text-white'
                 }`}>
                   {format(day, 'd')}
@@ -169,7 +169,7 @@ export const WeekView: React.FC<WeekViewProps> = ({
           style={{ 
             top: `${getCurrentTimePosition() + 73}px`, // Add header height offset
             height: '2px',
-            backgroundColor: '#4A154B'
+            backgroundColor: '#36C5F0'
           }}
         ></div>
 
@@ -207,13 +207,13 @@ export const WeekView: React.FC<WeekViewProps> = ({
 
               // Border logic - similar to CalendarGrid for proper overlap
               let borderStyle: React.CSSProperties = {}
-              let cellClasses = 'hover:!bg-[#4A154B]/25 transition-colors cursor-pointer relative '
+              let cellClasses = 'hover:!bg-[#36C5F0]/25 transition-colors cursor-pointer relative '
               
               if (isSelectedDayHour) {
                 // Individual day+hour selection: highlight only this specific cell with perfect border alignment
                 cellClasses += 'border-0' // Remove all default borders
                 borderStyle = {
-                  border: '1px solid #4A154B',
+                  border: '1px solid #36C5F0',
                   marginLeft: '-1px',
                   marginTop: '-1px',
                   marginBottom: '-1px',
@@ -224,9 +224,8 @@ export const WeekView: React.FC<WeekViewProps> = ({
               } else if (isSelectedColumn) {
                 // Column highlighting: use inline styles for precise overlap control
                 cellClasses += 'border-0 p-1' // Remove all default borders
-                borderStyle = {
-                  borderLeft: '1px solid #4A154B',
-                  borderRight: '1px solid #4A154B',
+                borderStyle = {                borderLeft: '1px solid #36C5F0',
+                borderRight: '1px solid #36C5F0',
                   borderBottom: '1px solid #2C2D30',
                   borderTop: 'none',
                   marginLeft: '-1px' // Overlap the left border for perfect alignment

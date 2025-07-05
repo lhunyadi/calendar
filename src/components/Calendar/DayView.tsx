@@ -101,9 +101,9 @@ export const DayView: React.FC<DayViewProps> = ({
           {/* Day header */}
           <button
             type="button"
-            className="p-3 text-center hover:!bg-[#4A154B]/25 transition-colors bg-[#1A1D21] border-0 w-full"
+            className="p-3 text-center hover:!bg-[#36C5F0]/25 transition-colors bg-[#1A1D21] border-0 w-full"
             style={selectedDate && isSameDay(currentDate, selectedDate) && selectedHour === null ? {
-              borderTop: '1px solid #4A154B',
+              borderTop: '1px solid #36C5F0',
               marginTop: '-1px',
               position: 'relative',
               zIndex: 10
@@ -115,7 +115,7 @@ export const DayView: React.FC<DayViewProps> = ({
             </div>
             <div className={`text-lg font-medium ${
               isToday 
-                ? 'bg-[#4A154B] text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto' 
+                ? 'bg-[#36C5F0] text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto' 
                 : 'text-white'
             }`}>
               {format(currentDate, 'd')}
@@ -129,7 +129,7 @@ export const DayView: React.FC<DayViewProps> = ({
           style={{ 
             top: `${getCurrentTimePosition() + 73}px`, // Add header height offset
             height: '2px',
-            backgroundColor: '#4A154B'
+            backgroundColor: '#36C5F0'
           }}
         ></div>
 
@@ -151,11 +151,11 @@ export const DayView: React.FC<DayViewProps> = ({
             {/* Day column */}
             <button
               type="button"
-              className={`hover:!bg-[#4A154B]/25 transition-colors relative w-full text-left min-h-[72px] ${
+              className={`hover:!bg-[#36C5F0]/25 transition-colors relative w-full text-left min-h-[72px] ${
                 selectedHour === hour ? 'border-0' : 'border-0 p-1'
               }`}
               style={selectedHour === hour ? {
-                border: '1px solid #4A154B',
+                border: '1px solid #36C5F0',
                 marginLeft: '-1px',
                 marginTop: '-1px',
                 marginBottom: '-1px',

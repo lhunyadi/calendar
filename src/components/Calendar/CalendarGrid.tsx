@@ -36,7 +36,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
   onDateClick,
   onDayHeaderClick,
 }) => {
-  const { getColorHex, getBgColor, getCalendarOutMonthColor, getTextColor, themeMode, getHoverColor, getTodayTextColor } = useTheme()
+  const { getColorHex, getBgColor, getCalendarOutMonthColor, getTextColor, themeMode, getTodayTextColor } = useTheme()
   
   const isWeekend = (date: Date): boolean => {
     const day = date.getDay()
@@ -72,7 +72,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
           onClick={() => onDayHeaderClick(dayDate)}
           onMouseEnter={(e) => {
             const target = e.currentTarget as HTMLElement
-            target.style.backgroundColor = getHoverColor() // Use theme-aware hover color
+            target.style.backgroundColor = `${getColorHex()}30` // Use selected color with opacity for hover
           }}
           onMouseLeave={(e) => {
             const target = e.currentTarget as HTMLElement
@@ -199,7 +199,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
             onClick={() => onDateClick(cloneDay)}
             onMouseEnter={(e) => {
               const target = e.currentTarget as HTMLElement
-              target.style.backgroundColor = getHoverColor() // Use theme-aware hover color
+              target.style.backgroundColor = `${getColorHex()}30` // Use selected color with opacity for hover
             }}
             onMouseLeave={(e) => {
               const target = e.currentTarget as HTMLElement

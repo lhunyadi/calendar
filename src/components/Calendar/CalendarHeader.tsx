@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { ChevronLeftIcon, ChevronRightIcon, Palette, Sun, Moon } from 'lucide-react'
 import { format } from '../../utils/dateUtils'
 import { ColorPalette } from '../shared/ColorPalette'
@@ -18,7 +18,8 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   onToday,
 }) => {
   const [isPaletteOpen, setIsPaletteOpen] = useState(false)
-  const { getColorHex, themeMode, toggleTheme, getTextColor, getBgColor, getSurfaceColor, getHoverColor } = useTheme()
+  const paletteButtonRef = useRef<HTMLButtonElement>(null)
+  const { getColorHex, themeMode, toggleTheme, getTextColor, getBgColor, getSurfaceColor } = useTheme()
 
   const getButtonIconColor = (): string => {
     return themeMode === 'dark' ? '#ffffff' : '#000000' // white in dark mode, black in light mode
@@ -52,62 +53,68 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
           borderColor: themeMode === 'dark' ? '#2C2D30' : '#e6e6e6'
         }}
       >
-        <button
-          onClick={toggleTheme}
-          className="relative p-1 rounded transition-colors mr-2"
-        >
-          {themeMode === 'dark' ? (
-            <Sun 
-              size={18} 
-              className="cursor-pointer transition-colors"
-              style={{ color: getButtonIconColor() }}
-              onMouseEnter={(e) => {
-                const target = e.currentTarget as SVGElement
-                target.style.color = getColorHex()
-              }}
-              onMouseLeave={(e) => {
-                const target = e.currentTarget as SVGElement
-                target.style.color = getButtonIconColor()
-              }}
-            />
-          ) : (
-            <Moon 
-              size={18} 
-              className="cursor-pointer transition-colors"
-              style={{ color: getButtonIconColor() }}
-              onMouseEnter={(e) => {
-                const target = e.currentTarget as SVGElement
-                target.style.color = getColorHex()
-              }}
-              onMouseLeave={(e) => {
-                const target = e.currentTarget as SVGElement
-                target.style.color = getButtonIconColor()
-              }}
+        <div className="flex items-center space-x-2">
+          {isPaletteOpen && (
+            <ColorPalette 
+              isOpen={isPaletteOpen} 
+              onClose={() => setIsPaletteOpen(false)}
+              paletteButtonRef={paletteButtonRef}
             />
           )}
-        </button>
-        <button
-          onClick={() => setIsPaletteOpen(!isPaletteOpen)}
-          className="relative p-1 rounded transition-colors"
-        >
-          <Palette 
-            size={18} 
-            className="cursor-pointer transition-colors"
-            style={{ color: getButtonIconColor() }}
-            onMouseEnter={(e) => {
-              const target = e.currentTarget as SVGElement
-              target.style.color = getColorHex()
-            }}
-            onMouseLeave={(e) => {
-              const target = e.currentTarget as SVGElement
-              target.style.color = getButtonIconColor()
-            }}
-          />
-        </button>
-        <ColorPalette 
-          isOpen={isPaletteOpen} 
-          onClose={() => setIsPaletteOpen(false)} 
-        />
+          <button
+            ref={paletteButtonRef}
+            onClick={() => setIsPaletteOpen(!isPaletteOpen)}
+            className="relative p-1 rounded transition-colors"
+          >
+            <Palette 
+              size={18} 
+              className="cursor-pointer transition-colors"
+              style={{ color: getButtonIconColor() }}
+              onMouseEnter={(e) => {
+                const target = e.currentTarget as SVGElement
+                target.style.color = getColorHex()
+              }}
+              onMouseLeave={(e) => {
+                const target = e.currentTarget as SVGElement
+                target.style.color = getButtonIconColor()
+              }}
+            />
+          </button>
+          <button
+            onClick={toggleTheme}
+            className="relative p-1 rounded transition-colors"
+          >
+            {themeMode === 'dark' ? (
+              <Sun 
+                size={18} 
+                className="cursor-pointer transition-colors"
+                style={{ color: getButtonIconColor() }}
+                onMouseEnter={(e) => {
+                  const target = e.currentTarget as SVGElement
+                  target.style.color = getColorHex()
+                }}
+                onMouseLeave={(e) => {
+                  const target = e.currentTarget as SVGElement
+                  target.style.color = getButtonIconColor()
+                }}
+              />
+            ) : (
+              <Moon 
+                size={18} 
+                className="cursor-pointer transition-colors"
+                style={{ color: getButtonIconColor() }}
+                onMouseEnter={(e) => {
+                  const target = e.currentTarget as SVGElement
+                  target.style.color = getColorHex()
+                }}
+                onMouseLeave={(e) => {
+                  const target = e.currentTarget as SVGElement
+                  target.style.color = getButtonIconColor()
+                }}
+              />
+            )}
+          </button>
+        </div>
       </div>
       
       {/* Main Header */}
@@ -150,7 +157,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
               style={{ color: getTextColor() }}
               onMouseEnter={(e) => {
                 const target = e.currentTarget as HTMLElement
-                target.style.backgroundColor = getHoverColor() // Use theme-aware hover color
+                target.style.backgroundColor = `${getColorHex()}30` // Use selected color with opacity for hover
               }}
               onMouseLeave={(e) => {
                 const target = e.currentTarget as HTMLElement
@@ -165,7 +172,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
               style={{ color: getTextColor() }}
               onMouseEnter={(e) => {
                 const target = e.currentTarget as HTMLElement
-                target.style.backgroundColor = getHoverColor() // Use theme-aware hover color
+                target.style.backgroundColor = `${getColorHex()}30` // Use selected color with opacity for hover
               }}
               onMouseLeave={(e) => {
                 const target = e.currentTarget as HTMLElement

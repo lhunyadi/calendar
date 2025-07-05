@@ -35,7 +35,7 @@ const AppContent = () => {
       id: 5,
       title: 'Release planning',
       date: new Date(2023, new Date().getMonth(), new Date().getDate()),
-      color: '#4A154B',
+      color: '#2EB67D',
     },
   ])
 

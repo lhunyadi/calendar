@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useMemo } from 'react'
 import type { ReactNode } from 'react'
 
-export type BrandColor = 'brand-blue' | 'brand-yellow' | 'brand-green' | 'brand-red' | 'brand-aubergine'
+export type BrandColor = 'brand-blue' | 'brand-yellow' | 'brand-green' | 'brand-red'
 export type ThemeMode = 'dark' | 'light'
 
 interface ThemeContextType {
@@ -39,8 +39,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     'brand-blue',
     'brand-yellow', 
     'brand-green',
-    'brand-red',
-    'brand-aubergine'
+    'brand-red'
   ]
 
   const toggleTheme = () => {
@@ -52,8 +51,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       'brand-blue': '#36C5F0',
       'brand-yellow': '#ECB22E',
       'brand-green': '#2EB67D',
-      'brand-red': '#E01E5A',
-      'brand-aubergine': '#4A154B'
+      'brand-red': '#E01E5A'
     }
     return colorMap[currentColor]
   }

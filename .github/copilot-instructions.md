@@ -25,7 +25,7 @@ This is a React TypeScript calendar application with the following features:
 
 ## Styling Guidelines
 - Use Tailwind CSS classes for styling
-- Dark theme with colors like #1A1D21, #2C2D30, #4A154B
+- Dark theme with colors like #1A1D21, #2C2D30, #36C5F0
 - Weekend days have diagonal stripe pattern
 - Responsive design principles
 - Modern glass-morphism effects
