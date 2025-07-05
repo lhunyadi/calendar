@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useTheme, type BrandColor } from '../../contexts/ThemeContext'
 
 interface ColorPaletteProps {
@@ -10,6 +10,32 @@ interface ColorPaletteProps {
 export const ColorPalette: React.FC<ColorPaletteProps> = ({ isOpen, onClose, paletteButtonRef }) => {
   const { currentColor, setCurrentColor, colorOptions, themeMode } = useTheme()
   const ref = useRef<HTMLDivElement>(null)
+  const [visibleColors, setVisibleColors] = useState<number>(0)
+
+  useEffect(() => {
+    if (isOpen) {
+      // Reset and start the sequential animation
+      setVisibleColors(0)
+      
+      // First color appears immediately
+      const timer = setTimeout(() => {
+        setVisibleColors(1) // Red appears at position 1
+      }, 30)
+
+      // Each subsequent color appears exactly when the previous color finishes moving to its next position
+      colorOptions.forEach((_, index) => {
+        if (index > 0) {
+          setTimeout(() => {
+            setVisibleColors(index + 1)
+          }, 30 + (index * 120)) // 120ms = faster animation duration
+        }
+      })
+
+      return () => clearTimeout(timer)
+    } else {
+      setVisibleColors(0)
+    }
+  }, [isOpen, colorOptions])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -50,22 +76,34 @@ export const ColorPalette: React.FC<ColorPaletteProps> = ({ isOpen, onClose, pal
 
   return (
     <div ref={ref} className="flex items-center space-x-2">
-      {colorOptions.map((color) => {
+      {colorOptions.slice(0, visibleColors).map((color) => {
         const ringColor = themeMode === 'dark' ? '#ffffff' : '#000000' // brand-white in dark, brand-black in light
         return (
-          <button
+          <div
             key={color}
-            onClick={() => handleColorSelect(color)}
-            className={`p-1 rounded-full transition-all hover:scale-110 ${
-              currentColor === color ? 'ring-2 ring-offset-1 ring-offset-transparent' : ''
-            }`}
-            style={currentColor === color ? { '--tw-ring-color': ringColor } as React.CSSProperties : {}}
+            className="transition-all duration-300 ease-out"
+            style={{
+              transform: 'translateX(0)',
+              opacity: 1,
+              animationName: 'slideInFromRight',
+              animationDuration: '0.12s', // Faster animation - 120ms
+              animationFillMode: 'both',
+              animationTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' // Smooth easing for precise timing
+            }}
           >
-            <div
-              className="w-4 h-4 rounded-full"
-              style={{ backgroundColor: getColorValue(color) }}
-            />
-          </button>
+            <button
+              onClick={() => handleColorSelect(color)}
+              className={`p-1 rounded-full transition-all duration-300 ease-out hover:scale-110 ${
+                currentColor === color ? 'ring-2 ring-offset-1 ring-offset-transparent' : ''
+              }`}
+              style={currentColor === color ? { '--tw-ring-color': ringColor } as React.CSSProperties : {}}
+            >
+              <div
+                className="w-4 h-4 rounded-full"
+                style={{ backgroundColor: getColorValue(color) }}
+              />
+            </button>
+          </div>
         )
       })}
     </div>

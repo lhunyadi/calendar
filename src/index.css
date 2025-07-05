@@ -27,3 +27,21 @@
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
   background: #e5e5e5;
 }
+
+/* Animation for color palette sequential reveal */
+@keyframes slideInFromRight {
+  0% {
+    transform: translateX(8px);
+    opacity: 0;
+    scale: 0.95;
+  }
+  80% {
+    transform: translateX(-0.5px);
+    scale: 1.01;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+    scale: 1;
+  }
+}
