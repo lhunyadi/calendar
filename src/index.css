@@ -4,6 +4,12 @@
 @tailwind utilities;
 /* DO NOT DELETE THESE TAILWIND IMPORTS, OTHERWISE THE STYLING WILL NOT RENDER AT ALL */
 
+/* Theme transition management - disable all transitions during theme changes */
+.theme-changing * {
+  transition: none !important;
+  animation: none !important;
+}
+
 /* Dark scrollbar styling for calendar views */
 .overflow-y-auto {
   scrollbar-width: thin;

@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useMemo } from 'react'
+import React, { createContext, useContext, useState, useMemo, startTransition } from 'react'
+import { flushSync } from 'react-dom'
 import type { ReactNode } from 'react'
 
 export type BrandColor = 'brand-blue' | 'brand-yellow' | 'brand-green' | 'brand-red'
@@ -34,6 +35,7 @@ interface ThemeProviderProps {
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [currentColor, setCurrentColor] = useState<BrandColor>('brand-blue') // Default to blue
   const [themeMode, setThemeMode] = useState<ThemeMode>('dark') // Default to dark mode
+  const [isChangingTheme, setIsChangingTheme] = useState(false)
 
   const colorOptions: BrandColor[] = [
     'brand-blue',
@@ -43,7 +45,37 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   ]
 
   const toggleTheme = () => {
-    setThemeMode(prev => prev === 'dark' ? 'light' : 'dark')
+    // Temporarily disable all transitions for instant theme change
+    setIsChangingTheme(true)
+    document.body.classList.add('theme-changing')
+    
+    // Use flushSync to ensure all components update simultaneously
+    flushSync(() => {
+      setThemeMode(prev => prev === 'dark' ? 'light' : 'dark')
+    })
+    
+    // Re-enable transitions after a frame
+    requestAnimationFrame(() => {
+      document.body.classList.remove('theme-changing')
+      setIsChangingTheme(false)
+    })
+  }
+
+  const setCurrentColorSync = (color: BrandColor) => {
+    // Temporarily disable all transitions for instant color change
+    setIsChangingTheme(true)
+    document.body.classList.add('theme-changing')
+    
+    // Use flushSync to ensure all components update simultaneously when color changes
+    flushSync(() => {
+      setCurrentColor(color)
+    })
+    
+    // Re-enable transitions after a frame
+    requestAnimationFrame(() => {
+      document.body.classList.remove('theme-changing')
+      setIsChangingTheme(false)
+    })
   }
 
   const getColorHex = (): string => {
@@ -103,7 +135,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   const value = useMemo(() => ({
     currentColor,
-    setCurrentColor,
+    setCurrentColor: setCurrentColorSync, // Use the synchronous version
     colorOptions,
     getColorHex,
     themeMode,

@@ -59,7 +59,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
       days.push(
         <div
           key={i}
-          className={`font-medium text-center py-2 text-sm cursor-pointer transition-colors ${
+          className={`font-medium text-center py-2 text-sm cursor-pointer ${
             isSelectedColumn ? 'border-t-2' : ''
           }`}
           style={{
@@ -72,11 +72,13 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
           onClick={() => onDayHeaderClick(dayDate)}
           onMouseEnter={(e) => {
             const target = e.currentTarget as HTMLElement
-            target.style.backgroundColor = `${getColorHex()}30` // Use selected color with opacity for hover
+            target.style.backgroundColor = getColorHex() // Use exact highlight color for hover
+            target.style.transition = 'background-color 0.2s ease' // Only transition on hover
           }}
           onMouseLeave={(e) => {
             const target = e.currentTarget as HTMLElement
             target.style.backgroundColor = getBgColor() // Reset to date header color
+            target.style.transition = 'background-color 0.2s ease' // Only transition on hover
           }}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -145,7 +147,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
         }
 
         // Determine cell classes
-        let cellClasses = 'flex-1 min-h-[120px] p-2 relative cursor-pointer transition-colors '
+        let cellClasses = 'flex-1 min-h-[120px] p-2 relative cursor-pointer '
         
         // Default text color class for out-of-month days
         if (!isSameMonth(day, monthStart)) {
@@ -199,12 +201,14 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
             onClick={() => onDateClick(cloneDay)}
             onMouseEnter={(e) => {
               const target = e.currentTarget as HTMLElement
-              target.style.backgroundColor = `${getColorHex()}30` // Use selected color with opacity for hover
+              target.style.backgroundColor = getColorHex() // Use exact highlight color for hover
+              target.style.transition = 'background-color 0.2s ease' // Only transition on hover
             }}
             onMouseLeave={(e) => {
               const target = e.currentTarget as HTMLElement
               // Reset to original background from finalCellStyle
               target.style.backgroundColor = finalCellStyle.backgroundColor || ''
+              target.style.transition = 'background-color 0.2s ease' // Only transition on hover
             }}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {

@@ -64,52 +64,58 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
           <button
             ref={paletteButtonRef}
             onClick={() => setIsPaletteOpen(!isPaletteOpen)}
-            className="relative p-1 rounded transition-colors"
+            className="relative p-1 rounded"
           >
             <Palette 
               size={18} 
-              className="cursor-pointer transition-colors"
+              className="cursor-pointer"
               style={{ color: getButtonIconColor() }}
               onMouseEnter={(e) => {
                 const target = e.currentTarget as SVGElement
                 target.style.color = getColorHex()
+                target.style.transition = 'color 0.2s ease' // Only transition on hover
               }}
               onMouseLeave={(e) => {
                 const target = e.currentTarget as SVGElement
                 target.style.color = getButtonIconColor()
+                target.style.transition = 'color 0.2s ease' // Only transition on hover
               }}
             />
           </button>
           <button
             onClick={toggleTheme}
-            className="relative p-1 rounded transition-colors"
+            className="relative p-1 rounded"
           >
             {themeMode === 'dark' ? (
               <Sun 
                 size={18} 
-                className="cursor-pointer transition-colors"
+                className="cursor-pointer"
                 style={{ color: getButtonIconColor() }}
                 onMouseEnter={(e) => {
                   const target = e.currentTarget as SVGElement
                   target.style.color = getColorHex()
+                  target.style.transition = 'color 0.2s ease' // Only transition on hover
                 }}
                 onMouseLeave={(e) => {
                   const target = e.currentTarget as SVGElement
                   target.style.color = getButtonIconColor()
+                  target.style.transition = 'color 0.2s ease' // Only transition on hover
                 }}
               />
             ) : (
               <Moon 
                 size={18} 
-                className="cursor-pointer transition-colors"
+                className="cursor-pointer"
                 style={{ color: getButtonIconColor() }}
                 onMouseEnter={(e) => {
                   const target = e.currentTarget as SVGElement
                   target.style.color = getColorHex()
+                  target.style.transition = 'color 0.2s ease' // Only transition on hover
                 }}
                 onMouseLeave={(e) => {
                   const target = e.currentTarget as SVGElement
                   target.style.color = getButtonIconColor()
+                  target.style.transition = 'color 0.2s ease' // Only transition on hover
                 }}
               />
             )}
@@ -130,7 +136,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
         <div className="flex items-center space-x-2">
           <button
             onClick={onToday}
-            className="px-3 py-1 rounded text-sm transition-colors"
+            className="px-3 py-1 rounded text-sm"
             style={{ 
               backgroundColor: getColorHex(),
               color: getTextColor()
@@ -139,10 +145,12 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
               const target = e.currentTarget as HTMLElement
               const currentColor = getColorHex()
               target.style.backgroundColor = `${currentColor}DD` // Slightly darker on hover for buttons
+              target.style.transition = 'background-color 0.2s ease' // Only transition on hover
             }}
             onMouseLeave={(e) => {
               const target = e.currentTarget as HTMLElement
               target.style.backgroundColor = getColorHex() // Back to original
+              target.style.transition = 'background-color 0.2s ease' // Only transition on hover
             }}
           >
             Today
@@ -153,30 +161,34 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
           >
             <button
               onClick={onPrevMonth}
-              className="p-1.5 transition-colors"
+              className="p-1.5"
               style={{ color: getTextColor() }}
               onMouseEnter={(e) => {
                 const target = e.currentTarget as HTMLElement
-                target.style.backgroundColor = `${getColorHex()}30` // Use selected color with opacity for hover
+                target.style.backgroundColor = getColorHex() // Use exact highlight color for hover
+                target.style.transition = 'background-color 0.2s ease' // Only transition on hover
               }}
               onMouseLeave={(e) => {
                 const target = e.currentTarget as HTMLElement
                 target.style.backgroundColor = 'transparent'
+                target.style.transition = 'background-color 0.2s ease' // Only transition on hover
               }}
             >
               <ChevronLeftIcon size={18} />
             </button>
             <button
               onClick={onNextMonth}
-              className="p-1.5 transition-colors"
+              className="p-1.5"
               style={{ color: getTextColor() }}
               onMouseEnter={(e) => {
                 const target = e.currentTarget as HTMLElement
-                target.style.backgroundColor = `${getColorHex()}30` // Use selected color with opacity for hover
+                target.style.backgroundColor = getColorHex() // Use exact highlight color for hover
+                target.style.transition = 'background-color 0.2s ease' // Only transition on hover
               }}
               onMouseLeave={(e) => {
                 const target = e.currentTarget as HTMLElement
                 target.style.backgroundColor = 'transparent'
+                target.style.transition = 'background-color 0.2s ease' // Only transition on hover
               }}
             >
               <ChevronRightIcon size={18} />
