@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useMemo, startTransition } from 'react'
+import React, { createContext, useContext, useState, useMemo } from 'react'
 import { flushSync } from 'react-dom'
 import type { ReactNode } from 'react'
 
@@ -35,7 +35,6 @@ interface ThemeProviderProps {
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [currentColor, setCurrentColor] = useState<BrandColor>('brand-blue') // Default to blue
   const [themeMode, setThemeMode] = useState<ThemeMode>('dark') // Default to dark mode
-  const [isChangingTheme, setIsChangingTheme] = useState(false)
 
   const colorOptions: BrandColor[] = [
     'brand-blue',
@@ -46,7 +45,6 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   const toggleTheme = () => {
     // Temporarily disable all transitions for instant theme change
-    setIsChangingTheme(true)
     document.body.classList.add('theme-changing')
     
     // Use flushSync to ensure all components update simultaneously
@@ -57,13 +55,11 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     // Re-enable transitions after a frame
     requestAnimationFrame(() => {
       document.body.classList.remove('theme-changing')
-      setIsChangingTheme(false)
     })
   }
 
   const setCurrentColorSync = (color: BrandColor) => {
     // Temporarily disable all transitions for instant color change
-    setIsChangingTheme(true)
     document.body.classList.add('theme-changing')
     
     // Use flushSync to ensure all components update simultaneously when color changes
@@ -74,7 +70,6 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     // Re-enable transitions after a frame
     requestAnimationFrame(() => {
       document.body.classList.remove('theme-changing')
-      setIsChangingTheme(false)
     })
   }
 
