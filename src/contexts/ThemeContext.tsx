@@ -122,10 +122,30 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     return themeMode === 'dark' ? '#222529' : '#fafafa' // brand-medium : brand-light
   }
 
-  // Hover color function that uses a consistent light blue across all themes
+  // Hover color function that calculates the exact resulting color to match across themes
   const getHoverColor = (): string => {
-    // Use a consistent light blue hover color regardless of theme or brand color
-    return '#36C5F030' // Light blue with 30 opacity - matches the blue from screenshot
+    const brandColor = getColorHex()
+    
+    // For dark mode, we want the nice light teal effect (brand color over dark background)
+    // For light mode, we calculate what solid color would give the same visual result
+    if (themeMode === 'dark') {
+      // Use transparency on dark background (original behavior)
+      return `${brandColor}40` // 25% opacity over dark background
+    } else {
+      // Calculate the exact RGB that would result from 25% brand color over white
+      // This gives us the same visual color as the dark mode hover, but as a solid color
+      const hex = brandColor.replace('#', '')
+      const r = parseInt(hex.substr(0, 2), 16)
+      const g = parseInt(hex.substr(2, 2), 16)
+      const b = parseInt(hex.substr(4, 2), 16)
+      
+      // Blend 25% brand color with 75% white (255,255,255)
+      const blendedR = Math.round(r * 0.25 + 255 * 0.75)
+      const blendedG = Math.round(g * 0.25 + 255 * 0.75)
+      const blendedB = Math.round(b * 0.25 + 255 * 0.75)
+      
+      return `#${blendedR.toString(16).padStart(2, '0')}${blendedG.toString(16).padStart(2, '0')}${blendedB.toString(16).padStart(2, '0')}`
+    }
   }
 
   // Get contrasting text color for today highlights - opposite of theme

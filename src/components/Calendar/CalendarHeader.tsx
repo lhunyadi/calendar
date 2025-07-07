@@ -19,7 +19,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 }) => {
   const [isPaletteOpen, setIsPaletteOpen] = useState(false)
   const paletteButtonRef = useRef<HTMLButtonElement>(null)
-  const { getColorHex, themeMode, toggleTheme, getTextColor, getBgColor, getSurfaceColor } = useTheme()
+  const { getColorHex, themeMode, toggleTheme, getTextColor, getBgColor, getSurfaceColor, getHoverColor } = useTheme()
 
   const getButtonIconColor = (): string => {
     return themeMode === 'dark' ? '#ffffff' : '#000000' // white in dark mode, black in light mode
@@ -165,7 +165,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
               style={{ color: getTextColor() }}
               onMouseEnter={(e) => {
                 const target = e.currentTarget as HTMLElement
-                target.style.backgroundColor = getColorHex() // Use exact highlight color for hover
+                target.style.backgroundColor = getHoverColor() // Use transparent brand color
                 target.style.transition = 'background-color 0.2s ease' // Only transition on hover
               }}
               onMouseLeave={(e) => {
@@ -182,7 +182,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
               style={{ color: getTextColor() }}
               onMouseEnter={(e) => {
                 const target = e.currentTarget as HTMLElement
-                target.style.backgroundColor = getColorHex() // Use exact highlight color for hover
+                target.style.backgroundColor = getHoverColor() // Use transparent brand color
                 target.style.transition = 'background-color 0.2s ease' // Only transition on hover
               }}
               onMouseLeave={(e) => {
