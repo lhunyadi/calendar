@@ -26,6 +26,7 @@ interface CalendarGridProps {
   selectedColumn: number | null
   onDateClick: (date: Date) => void
   onDayHeaderClick: (date: Date) => void
+  onDateDoubleClick?: (date: Date) => void
 }
 
 export const CalendarGrid: React.FC<CalendarGridProps> = ({
@@ -35,6 +36,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
   selectedColumn,
   onDateClick,
   onDayHeaderClick,
+  onDateDoubleClick,
 }) => {
   const { getColorHex, getBgColor, getCalendarOutMonthColor, getTextColor, themeMode, getTodayTextColor, getHoverColor } = useTheme()
   
@@ -85,13 +87,13 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
     }
 
     return (
-      <div className="grid grid-cols-7 border-b" style={{ borderColor: themeMode === 'dark' ? '#2C2D30' : '#e6e6e6' }}>{days}</div>
+      <div className={"grid grid-cols-7 border-b " + (themeMode === 'dark' ? 'border-dark-border' : 'border-light-border')}>{days}</div>
     )
   }
 
   const getWeekendPattern = () => {
-    return themeMode === 'dark' 
-      ? `linear-gradient(45deg, #2c2f33 25%, transparent 25%, transparent 50%, #2c2f33 50%, #2c2f33 75%, transparent 75%, transparent)`
+    return themeMode === 'dark'
+      ? `linear-gradient(45deg, #2C2D30 25%, transparent 25%, transparent 50%, #2C2D30 50%, #2C2D30 75%, transparent 75%, transparent)`
       : `linear-gradient(45deg, #e6e6e6 25%, transparent 25%, transparent 50%, #e6e6e6 50%, #e6e6e6 75%, transparent 75%, transparent)`
   }
 
@@ -213,6 +215,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
             className={cellClasses}
             style={finalCellStyle}
             onClick={() => onDateClick(cloneDay)}
+            onDoubleClick={() => onDateDoubleClick?.(cloneDay)}
             onMouseEnter={(e) => {
               const target = e.currentTarget as HTMLElement
               target.style.backgroundColor = getHoverColor()

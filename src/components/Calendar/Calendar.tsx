@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { CalendarHeader } from './CalendarHeader'
 import { CalendarGrid } from './CalendarGrid'
+import { EventModal } from '../shared/EventModal'
 import { addMonths, subMonths } from '../../utils/dateUtils'
 
 interface Event {
@@ -18,6 +19,10 @@ export const Calendar: React.FC<CalendarProps> = ({ events }) => {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date()) // Highlight today by default
   const [selectedColumn, setSelectedColumn] = useState<number | null>(null) // Track column selection separately
+  
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [modalDate, setModalDate] = useState<Date | null>(null)
 
   const goToPreviousMonth = () => {
     setCurrentDate(subMonths(currentDate, 1))
@@ -50,6 +55,16 @@ export const Calendar: React.FC<CalendarProps> = ({ events }) => {
     setSelectedDate(null) // Clear individual day selection
   }
 
+  const handleDateDoubleClick = (date: Date) => {
+    setModalDate(date)
+    setIsModalOpen(true)
+  }
+
+  const handleModalClose = () => {
+    setIsModalOpen(false)
+    setModalDate(null)
+  }
+
   return (
     <div className="bg-[#1A1D21] h-full flex flex-col border border-[#2C2D30]">
       {/* Calendar Header */}
@@ -71,8 +86,16 @@ export const Calendar: React.FC<CalendarProps> = ({ events }) => {
           selectedColumn={selectedColumn}
           onDateClick={handleDateClick}
           onDayHeaderClick={handleDayHeaderClick}
+          onDateDoubleClick={handleDateDoubleClick}
         />
       </div>
+      
+      {/* Event Modal */}
+      <EventModal
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        selectedDate={modalDate}
+      />
     </div>
   )
 }

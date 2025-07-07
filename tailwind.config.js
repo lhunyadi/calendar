@@ -11,6 +11,7 @@ export default {
         'brand-yellow': '#ECB22E',
         'brand-green': '#2EB67D',
         'brand-red': '#E01E5A',
+        'brand-aubergine': '#7C3085',
         'brand-white': '#ffffff',
         'brand-black': '#000000',
 
@@ -18,7 +19,10 @@ export default {
         'brand-medium': '#222529',
 
         'brand-light': '#fafafa',
-        'brand-gray': '#e6e6e6',
+
+
+        'light-border': '#e6e6e6',
+        'dark-border': '#2C2D30',
 
       },
     },
