@@ -30,7 +30,7 @@ export const CalendarEvent: React.FC<CalendarEventProps> = ({ event }) => {
         borderWidth: '1px',
         borderStyle: 'solid',
         color: '#fff',
-        minHeight: '1.25rem',
+        minHeight: '2.2rem',
         fontWeight: 500,
         maxWidth: '100%',
       }}

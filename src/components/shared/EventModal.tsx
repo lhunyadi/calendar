@@ -156,7 +156,7 @@ export const EventModal: React.FC<EventModalProps> = ({
             <div className={`flex items-center px-4 py-4`}
                  style={{ borderBottom: `1px solid ${themeMode === 'dark' ? '#2C2D30' : '#e6e6e6'}` }}>
               <button
-                className="flex flex-row items-center justify-center gap-2 rounded shadow text-sm"
+                className="flex flex-row items-center justify-center gap-2 rounded shadow text-sm px-3 py-1"
                 style={{
                   backgroundColor: getColorHex(),
                   color: themeMode === 'dark' ? '#fff' : '#000',
@@ -164,22 +164,27 @@ export const EventModal: React.FC<EventModalProps> = ({
                   outline: 'none',
                   height: '2.25rem',
                   minWidth: '2.25rem',
-                  padding: '0 0.75rem',
                   fontSize: '0.875rem',
                   lineHeight: '1.25rem',
                   transition: 'color 0.2s, background 0.2s',
                   display: 'flex',
-                  gap: '0.5ch'
+                  gap: '0.5ch',
+                  cursor: 'pointer',
+                  opacity: (!eventName.trim() || !selectedColor || selectedPriority === -1) ? 0.6 : 1,
+                  pointerEvents: (!eventName.trim() || !selectedColor || selectedPriority === -1) ? 'none' : 'auto',
                 }}
                 onMouseEnter={e => {
                   const target = e.currentTarget as HTMLElement;
+                  const currentColor = getColorHex();
+                  target.style.backgroundColor = `${currentColor}DD`;
                   target.style.color = themeMode === 'dark' ? '#000' : '#fff';
-                  target.style.transition = 'color 0.2s';
+                  target.style.transition = 'color 0.2s, background 0.2s';
                 }}
                 onMouseLeave={e => {
                   const target = e.currentTarget as HTMLElement;
+                  target.style.backgroundColor = getColorHex();
                   target.style.color = themeMode === 'dark' ? '#fff' : '#000';
-                  target.style.transition = 'color 0.2s';
+                  target.style.transition = 'color 0.2s, background 0.2s';
                 }}
                 title="Save"
                 onClick={handleSave}

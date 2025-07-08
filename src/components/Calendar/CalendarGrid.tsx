@@ -156,7 +156,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
   }
 
   const renderDayContent = (day: Date, formattedDate: string, dayEvents: Event[], currentColor: string) => {
-    // Fixed event area height: show up to 4 events (1.5rem each + gap/padding)
+    // Extend event area height a bit further down (show up to 3 events, but area is taller for visual balance)
     return (
       <div className="flex flex-col h-full w-full">
         <div className="p-1">
@@ -172,11 +172,11 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
           </span>
         </div>
         <div
-          className="flex flex-col gap-1 w-full overflow-y-auto custom-scrollbar"
+          className="flex flex-col gap-1 w-full overflow-y-auto custom-scrollbar pb-2"
           style={{
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
-            maxHeight: '6.5rem', // 4 * 1.25rem (minHeight of event) + 3 * 0.25rem (gap)
+            maxHeight: '7.2rem', // Extended further down for more space
             minHeight: 0,
           }}
         >
