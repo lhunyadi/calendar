@@ -139,18 +139,21 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
             className="px-3 py-1 rounded text-sm"
             style={{ 
               backgroundColor: getColorHex(),
-              color: getTextColor()
+              color: themeMode === 'dark' ? '#fff' : '#000',
+              transition: 'color 0.2s, background 0.2s'
             }}
             onMouseEnter={(e) => {
-              const target = e.currentTarget as HTMLElement
-              const currentColor = getColorHex()
-              target.style.backgroundColor = `${currentColor}DD` // Slightly darker on hover for buttons
-              target.style.transition = 'background-color 0.2s ease' // Only transition on hover
+              const target = e.currentTarget as HTMLElement;
+              const currentColor = getColorHex();
+              target.style.backgroundColor = `${currentColor}DD`;
+              target.style.color = themeMode === 'dark' ? '#000' : '#fff';
+              target.style.transition = 'color 0.2s, background 0.2s';
             }}
             onMouseLeave={(e) => {
-              const target = e.currentTarget as HTMLElement
-              target.style.backgroundColor = getColorHex() // Back to original
-              target.style.transition = 'background-color 0.2s ease' // Only transition on hover
+              const target = e.currentTarget as HTMLElement;
+              target.style.backgroundColor = getColorHex();
+              target.style.color = themeMode === 'dark' ? '#fff' : '#000';
+              target.style.transition = 'color 0.2s, background 0.2s';
             }}
           >
             Today
