@@ -13,8 +13,12 @@ export const EventModal: React.FC<EventModalProps> = ({
   selectedDate,
 }) => {
   const [eventName, setEventName] = React.useState("");
-  const [selectedColor, setSelectedColor] = React.useState<string>("#36C5F0");
-  const { getBgColor, getTextColor, getColorHex, getSurfaceColor, themeMode } = useTheme()
+  const { getBgColor, getTextColor, getColorHex, getSurfaceColor, themeMode } = useTheme();
+  // Use the current highlight color from the calendar as the default
+  const highlightColor = getColorHex();
+  const [selectedColor, setSelectedColor] = React.useState<string>(highlightColor);
+  // Priority: 0 = Low, 1 = Medium, 2 = High, -1 = none
+  const [selectedPriority, setSelectedPriority] = React.useState<number>(-1);
 
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -39,12 +43,14 @@ export const EventModal: React.FC<EventModalProps> = ({
     }
   }, [isOpen])
 
-  // Reset eventName when modal closes
+  // Reset eventName and selectedColor when modal closes
   useEffect(() => {
     if (!isOpen) {
       setEventName("");
+      setSelectedColor(highlightColor);
+      setSelectedPriority(-1);
     }
-  }, [isOpen]);
+  }, [isOpen, highlightColor]);
 
   // Escape closes modal: listen on document when open
   useEffect(() => {
@@ -68,7 +74,7 @@ export const EventModal: React.FC<EventModalProps> = ({
       {/* Backdrop */}
       <button
         className="absolute inset-0 w-full h-full"
-        style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+        style={{ backgroundColor: 'rgb(0, 0, 0, 0.5)' }}
         onClick={onClose}
         aria-label="Close modal"
         tabIndex={-1}
@@ -168,7 +174,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                 <span style={{ fontSize: '0.875rem', lineHeight: '1.25rem', display: 'inline' }}>Save</span>
               </button>
             </div>
-            {/* Empty header section between Save and Name, visually separated only by the same grey line as other modal sections */}
+            {/* Color header section */}
             <div
               className="flex items-center gap-2 px-4"
               style={{
@@ -218,6 +224,64 @@ export const EventModal: React.FC<EventModalProps> = ({
                       style={{ backgroundColor: color }}
                     />
                   </button>
+                );
+              })}
+            </div>
+            {/* Empty header section between Color and Name, visually separated only by the same grey line as other modal sections */}
+            <div
+              className="flex items-center gap-2 px-4"
+              style={{
+                borderBottom: `1px solid ${themeMode === 'dark' ? '#2C2D30' : '#e6e6e6'}`,
+                minHeight: '2.25rem',
+                margin: 0,
+                background: 'none',
+                borderTop: 'none',
+                borderLeft: 'none',
+                borderRight: 'none',
+                boxShadow: 'none',
+                paddingLeft: '1rem',
+                paddingRight: '1rem',
+                paddingTop: '1rem',
+                paddingBottom: '1rem',
+              }}
+            >
+              {/* 3 rectangles visually separated, now as buttons with theme-aware outline */}
+              {["Low", "Medium", "High"].map((label, idx) => {
+                let background = 'transparent';
+                if (idx === 1) {
+                  background = themeMode === 'dark'
+                    ? `repeating-linear-gradient(135deg, ${selectedColor}33 0 8px, transparent 8px 16px)`
+                    : `repeating-linear-gradient(135deg, ${selectedColor}22 0 8px, transparent 8px 16px)`;
+                } else if (idx === 2) {
+                  background = themeMode === 'dark'
+                    ? `linear-gradient(90deg, ${selectedColor}33 0%, ${selectedColor}33 100%)`
+                    : `linear-gradient(90deg, ${selectedColor}22 0%, ${selectedColor}22 100%)`;
+                }
+                const isSelected = selectedPriority === idx;
+                return (
+                  <button
+                    key={label}
+                    type="button"
+                    aria-label={`${label} priority`}
+                    tabIndex={0}
+                    onClick={() => setSelectedPriority(idx)}
+                    style={{
+                      width: '53px',
+                      height: '1.25rem',
+                      borderRadius: '0.375rem',
+                      border: isSelected
+                        ? `1px solid ${themeMode === 'dark' ? '#fff' : '#000'}`
+                        : `1px solid ${selectedColor}`,
+                      background,
+                      outline: 'none',
+                      boxShadow: 'none',
+                      transition: 'border-color 0.2s',
+                      cursor: 'pointer',
+                      position: 'relative',
+                      marginRight: idx < 2 ? '0.5rem' : undefined,
+                      zIndex: 1,
+                    }}
+                  />
                 );
               })}
             </div>
