@@ -14,9 +14,10 @@ import { useTheme } from '../../contexts/ThemeContext'
 
 interface Event {
   id: number
-  title: string
+  name: string
   date: Date
   color: string
+  priority: number
 }
 
 interface CalendarGridProps {
@@ -155,13 +156,14 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
   }
 
   const renderDayContent = (day: Date, formattedDate: string, dayEvents: Event[], currentColor: string) => {
+    // Fixed event area height: show up to 4 events (1.5rem each + gap/padding)
     return (
-      <>
+      <div className="flex flex-col h-full w-full">
         <div className="p-1">
           <span
             className={`text-sm ${isSameDay(day, new Date()) ? 'rounded-full w-6 h-6 flex items-center justify-center inline-flex' : ''}`}
             style={
-              isSameDay(day, new Date()) 
+              isSameDay(day, new Date())
                 ? { backgroundColor: currentColor, color: getTodayTextColor() }
                 : {}
             }
@@ -169,12 +171,20 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
             {formattedDate}
           </span>
         </div>
-        <div className="overflow-y-auto max-h-[80px]">
+        <div
+          className="flex flex-col gap-1 w-full overflow-y-auto custom-scrollbar"
+          style={{
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            maxHeight: '6.5rem', // 4 * 1.25rem (minHeight of event) + 3 * 0.25rem (gap)
+            minHeight: 0,
+          }}
+        >
           {dayEvents.map((event) => (
             <CalendarEvent key={event.id} event={event} />
           ))}
         </div>
-      </>
+      </div>
     )
   }
 

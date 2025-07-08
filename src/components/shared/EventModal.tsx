@@ -5,12 +5,14 @@ interface EventModalProps {
   isOpen: boolean
   onClose: () => void
   selectedDate: Date | null
+  onSave: (event: { name: string; color: string; priority: number; date: Date }) => void;
 }
 
 export const EventModal: React.FC<EventModalProps> = ({
   isOpen,
   onClose,
   selectedDate,
+  onSave,
 }) => {
   const [eventName, setEventName] = React.useState("");
   const { getBgColor, getTextColor, getColorHex, getSurfaceColor, themeMode } = useTheme();
@@ -69,6 +71,16 @@ export const EventModal: React.FC<EventModalProps> = ({
   if (!isOpen || !selectedDate) {
     return null;
   }
+  const handleSave = () => {
+    if (!eventName.trim() || !selectedColor || selectedPriority === -1 || !selectedDate) return;
+    onSave({
+      name: eventName.trim(),
+      color: selectedColor,
+      priority: selectedPriority,
+      date: selectedDate,
+    });
+    onClose();
+  };
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
@@ -170,6 +182,9 @@ export const EventModal: React.FC<EventModalProps> = ({
                   target.style.transition = 'color 0.2s';
                 }}
                 title="Save"
+                onClick={handleSave}
+                disabled={!eventName.trim() || !selectedColor || selectedPriority === -1}
+                aria-disabled={!eventName.trim() || !selectedColor || selectedPriority === -1}
               >
                 <span style={{ fontSize: '0.875rem', lineHeight: '1.25rem', display: 'inline' }}>Save</span>
               </button>
