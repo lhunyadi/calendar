@@ -172,11 +172,11 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
           </span>
         </div>
         <div
-          className="flex flex-col gap-1 w-full overflow-y-auto custom-scrollbar pb-2"
+          className="flex flex-col gap-1 w-full overflow-y-auto custom-scrollbar pb-2 mt-2.5"
           style={{
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
-            maxHeight: '7.2rem', // Extended further down for more space
+            maxHeight: '7.2rem',
             minHeight: 0,
           }}
         >
