@@ -13,6 +13,7 @@ export const EventModal: React.FC<EventModalProps> = ({
   selectedDate,
 }) => {
   const [eventName, setEventName] = React.useState("");
+  const [selectedColor, setSelectedColor] = React.useState<string>("#36C5F0");
   const { getBgColor, getTextColor, getColorHex, getSurfaceColor, themeMode } = useTheme()
 
   const inputRef = useRef<HTMLInputElement>(null)
@@ -45,14 +46,15 @@ export const EventModal: React.FC<EventModalProps> = ({
     }
   }, [isOpen]);
 
-  if (!isOpen || !selectedDate) return null
+  if (!isOpen || !selectedDate) {
+    return null;
+  }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
-      onClose()
+      onClose();
     }
-  }
-
+  };
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
@@ -63,15 +65,14 @@ export const EventModal: React.FC<EventModalProps> = ({
         onKeyDown={handleKeyDown}
         aria-label="Close modal"
       />
-      
       {/* Modal content */}
       <div
         className="relative rounded shadow-lg z-10"
         style={{
           backgroundColor: getBgColor(),
           color: getTextColor(),
-          padding: '32px', // 2x 16px (left/right/top/bottom)
-          width: '48rem', // 2x w-96 (24rem)
+          padding: '32px',
+          width: '48rem',
           minWidth: '48rem',
           height: 'auto',
           minHeight: '0',
@@ -79,8 +80,8 @@ export const EventModal: React.FC<EventModalProps> = ({
       >
         {/* Header with both title and close button */}
         <div className="flex items-center justify-between h-6">
-          <h2 
-            className="text-sm font-medium leading-6 m-0 font-['Segoe_UI','system-ui','sans-serif']"
+          <h2
+            className="text-lg font-medium leading-6 m-0 font-['Segoe_UI','system-ui','sans-serif']"
             style={{ color: getColorHex() }}
             title={eventName || 'Event'}
           >
@@ -89,7 +90,7 @@ export const EventModal: React.FC<EventModalProps> = ({
           <button
             onClick={onClose}
             className="w-6 h-6 flex items-center justify-center transition-colors material-icons-outlined"
-            style={{ 
+            style={{
               color: getTextColor(),
               backgroundColor: 'transparent',
               border: 'none',
@@ -110,22 +111,21 @@ export const EventModal: React.FC<EventModalProps> = ({
             close
           </button>
         </div>
-        
         {/* Modal content */}
         <div className="flex flex-col h-full">
           {/* Inner box with header surface color */}
-            <div 
-              className={`w-full rounded flex flex-col border ${themeMode === 'dark' ? 'border-dark-border' : 'border-light-border'}`}
-              style={{
-                backgroundColor: getSurfaceColor(),
-                marginTop: '4%', // 4% of modal height
-                marginBottom: '0', // no extra bottom margin
-                marginLeft: '0',
-                marginRight: '0',
-                height: 'auto',
-                minHeight: '0',
-              }}
-            >
+          <div
+            className={`w-full rounded flex flex-col border ${themeMode === 'dark' ? 'border-dark-border' : 'border-light-border'}`}
+            style={{
+              backgroundColor: getSurfaceColor(),
+              marginTop: '4%',
+              marginBottom: '0',
+              marginLeft: '0',
+              marginRight: '0',
+              height: 'auto',
+              minHeight: '0',
+            }}
+          >
             {/* Save header */}
             <div className={`flex items-center px-4 py-4`}
                  style={{ borderBottom: `1px solid ${themeMode === 'dark' ? '#2C2D30' : '#e6e6e6'}` }}>
@@ -136,7 +136,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                   color: themeMode === 'dark' ? '#fff' : '#000',
                   border: 'none',
                   outline: 'none',
-                  height: '2.25rem', // match textbox height
+                  height: '2.25rem',
                   minWidth: '2.25rem',
                   padding: '0 0.75rem',
                   fontSize: '0.875rem',
@@ -157,11 +157,61 @@ export const EventModal: React.FC<EventModalProps> = ({
                 }}
                 title="Save"
               >
-                <span className="material-icons-outlined" style={{ fontSize: '0.875rem', lineHeight: '1.25rem', verticalAlign: 'middle' }}>
-                  edit_calendar
-                </span>
                 <span style={{ fontSize: '0.875rem', lineHeight: '1.25rem', display: 'inline' }}>Save</span>
               </button>
+            </div>
+            {/* Empty header section between Save and Name, visually separated only by the same grey line as other modal sections */}
+            <div
+              className="flex items-center gap-2 px-4"
+              style={{
+                borderBottom: `1px solid ${themeMode === 'dark' ? '#2C2D30' : '#e6e6e6'}`,
+                minHeight: '2.25rem',
+                margin: 0,
+                background: 'none',
+                borderTop: 'none',
+                borderLeft: 'none',
+                borderRight: 'none',
+                boxShadow: 'none',
+                paddingLeft: '1rem',
+                paddingRight: '1rem',
+                paddingTop: '1rem',
+                paddingBottom: '1rem',
+              }}
+            >
+              {/* Color circles with highlight effect matching ColorPalette */}
+              {[
+                { color: '#36C5F0', label: 'Blue' },
+                { color: '#2EB67D', label: 'Green' },
+                { color: '#ECB22E', label: 'Yellow' },
+                { color: '#E01E5A', label: 'Red' },
+              ].map(({ color, label }) => {
+                // Brand-white in dark, brand-black in light
+                const ringColor = themeMode === 'dark' ? '#ffffff' : '#000000';
+                const isSelected = selectedColor === color;
+                return (
+                  <button
+                    key={color}
+                    type="button"
+                    title={label}
+                    aria-label={label}
+                    onClick={() => setSelectedColor(color)}
+                    className={`p-1 rounded-full transition-all duration-300 ease-out hover:scale-110 ${
+                      isSelected ? 'ring-2 ring-offset-1 ring-offset-transparent' : ''
+                    }`}
+                    style={
+                      isSelected
+                        ? { '--tw-ring-color': ringColor } as React.CSSProperties
+                        : {}
+                    }
+                    tabIndex={0}
+                  >
+                    <div
+                      className="w-4 h-4 rounded-full"
+                      style={{ backgroundColor: color }}
+                    />
+                  </button>
+                );
+              })}
             </div>
             {/* Name section */}
             <div className="px-4 py-4 flex flex-col gap-1"
@@ -178,7 +228,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                 style={{
                   color: themeMode === 'dark' ? '#b0b3b8' : '#8a8a8a',
                   backgroundColor: 'transparent',
-                  fontSize: '0.875rem', // text-sm
+                  fontSize: '0.875rem',
                   lineHeight: '1.25rem',
                   fontWeight: 400,
                   borderColor: getColorHex(),
@@ -203,13 +253,13 @@ export const EventModal: React.FC<EventModalProps> = ({
                 style={{
                   color: themeMode === 'dark' ? '#b0b3b8' : '#8a8a8a',
                   backgroundColor: 'transparent',
-                  fontSize: '0.875rem', // text-sm
-                  lineHeight: '1.25rem', // text-sm
+                  fontSize: '0.875rem',
+                  lineHeight: '1.25rem',
                   fontWeight: 400,
                   borderColor: getColorHex(),
                   borderWidth: '1px',
                   borderStyle: 'solid',
-                  minHeight: '12.5rem', // 10 lines * 1.25rem
+                  minHeight: '12.5rem',
                   maxHeight: 'none',
                   height: '12.5rem',
                   resize: 'none',
@@ -226,5 +276,5 @@ export const EventModal: React.FC<EventModalProps> = ({
         </div>
       </div>
     </div>
-  )
+  );
 }
