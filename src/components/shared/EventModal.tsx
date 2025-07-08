@@ -46,15 +46,23 @@ export const EventModal: React.FC<EventModalProps> = ({
     }
   }, [isOpen]);
 
+  // Escape closes modal: listen on document when open
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen || !selectedDate) {
     return null;
   }
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      onClose();
-    }
-  };
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
@@ -62,8 +70,8 @@ export const EventModal: React.FC<EventModalProps> = ({
         className="absolute inset-0 w-full h-full"
         style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
         onClick={onClose}
-        onKeyDown={handleKeyDown}
         aria-label="Close modal"
+        tabIndex={-1}
       />
       {/* Modal content */}
       <div
@@ -231,15 +239,17 @@ export const EventModal: React.FC<EventModalProps> = ({
                   fontSize: '0.875rem',
                   lineHeight: '1.25rem',
                   fontWeight: 400,
-                  borderColor: getColorHex(),
+                  borderColor: inputRef.current && document.activeElement === inputRef.current ? getColorHex() : (themeMode === 'dark' ? '#2C2D30' : '#e6e6e6'),
                   borderWidth: '1px',
                   borderStyle: 'solid'
                 }}
                 onFocus={e => {
                   e.currentTarget.style.color = themeMode === 'dark' ? '#fff' : '#000';
+                  e.currentTarget.style.borderColor = getColorHex();
                 }}
                 onBlur={e => {
                   e.currentTarget.style.color = themeMode === 'dark' ? '#b0b3b8' : '#8a8a8a';
+                  e.currentTarget.style.borderColor = themeMode === 'dark' ? '#2C2D30' : '#e6e6e6';
                 }}
               />
             </div>
@@ -256,7 +266,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                   fontSize: '0.875rem',
                   lineHeight: '1.25rem',
                   fontWeight: 400,
-                  borderColor: getColorHex(),
+                  borderColor: document.activeElement && document.activeElement.id === 'event-description-input' ? getColorHex() : (themeMode === 'dark' ? '#2C2D30' : '#e6e6e6'),
                   borderWidth: '1px',
                   borderStyle: 'solid',
                   minHeight: '12.5rem',
@@ -266,9 +276,11 @@ export const EventModal: React.FC<EventModalProps> = ({
                 }}
                 onFocus={e => {
                   e.currentTarget.style.color = themeMode === 'dark' ? '#fff' : '#000';
+                  e.currentTarget.style.borderColor = getColorHex();
                 }}
                 onBlur={e => {
                   e.currentTarget.style.color = themeMode === 'dark' ? '#b0b3b8' : '#8a8a8a';
+                  e.currentTarget.style.borderColor = themeMode === 'dark' ? '#2C2D30' : '#e6e6e6';
                 }}
               />
             </div>
