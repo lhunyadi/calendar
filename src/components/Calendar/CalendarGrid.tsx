@@ -23,6 +23,7 @@ interface Event {
 interface CalendarGridProps {
   currentDate: Date
   events: Event[]
+  setEvents: React.Dispatch<React.SetStateAction<Event[]>>
   selectedDate: Date | null
   selectedColumn: number | null
   onDateClick: (date: Date) => void
@@ -33,6 +34,7 @@ interface CalendarGridProps {
 export const CalendarGrid: React.FC<CalendarGridProps> = ({
   currentDate,
   events,
+  setEvents,
   selectedDate,
   selectedColumn,
   onDateClick,
@@ -155,8 +157,44 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
     return cellClasses
   }
 
-  const renderDayContent = (day: Date, formattedDate: string, dayEvents: Event[], currentColor: string) => {
-    // Extend event area height a bit further down (show up to 3 events, but area is taller for visual balance)
+  // Drag state
+  const [draggedEventId, setDraggedEventId] = React.useState<number | null>(null)
+  const [dragOverEventId, setDragOverEventId] = React.useState<number | null>(null)
+  const [dragOverPosition, setDragOverPosition] = React.useState<'above' | 'below' | null>(null)
+
+  // Helper to reorder events within a date
+  const reorderEvents = (
+    date: Date,
+    draggedId: number,
+    targetId: number,
+    position: 'above' | 'below'
+  ) => {
+    setEvents(prevEvents => {
+      // Only reorder events for the same date
+      const dayEvents = prevEvents.filter(e => isSameDay(e.date, date))
+      const otherEvents = prevEvents.filter(e => !isSameDay(e.date, date))
+
+      const draggedIdx = dayEvents.findIndex(e => e.id === draggedId)
+      const targetIdx = dayEvents.findIndex(e => e.id === targetId)
+      if (draggedIdx === -1 || targetIdx === -1 || draggedIdx === targetIdx) return prevEvents
+
+      // Remove dragged event
+      const [draggedEvent] = dayEvents.splice(draggedIdx, 1)
+      // Insert at new position
+      let insertIdx = position === 'above' ? targetIdx : targetIdx + 1
+      if (insertIdx > dayEvents.length) insertIdx = dayEvents.length
+      dayEvents.splice(insertIdx, 0, draggedEvent)
+
+      return [...otherEvents, ...dayEvents]
+    })
+  }
+
+  const renderDayContent = (
+    day: Date,
+    formattedDate: string,
+    dayEvents: Event[],
+    currentColor: string
+  ) => {
     return (
       <div className="flex flex-col h-full w-full">
         <div className="p-1">
@@ -180,8 +218,43 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
             minHeight: 0,
           }}
         >
-          {dayEvents.map((event) => (
-            <CalendarEvent key={event.id} event={event} />
+          {dayEvents.map((event, idx) => (
+            <CalendarEvent
+              key={event.id}
+              event={event}
+              draggable
+              onDragStart={() => setDraggedEventId(event.id)}
+              onDragEnd={() => {
+                setDraggedEventId(null)
+                setDragOverEventId(null)
+                setDragOverPosition(null)
+              }}
+              onDragOver={e => {
+                e.preventDefault()
+                const rect = e.currentTarget.getBoundingClientRect()
+                const offset = e.clientY - rect.top
+                const position =
+                  offset < rect.height / 2 ? 'above' : 'below'
+                setDragOverEventId(event.id)
+                setDragOverPosition(position)
+              }}
+              onDrop={e => {
+                e.preventDefault()
+                if (
+                  draggedEventId !== null &&
+                  dragOverEventId !== null &&
+                  draggedEventId !== dragOverEventId
+                ) {
+                  reorderEvents(day, draggedEventId, dragOverEventId, dragOverPosition!)
+                }
+                setDraggedEventId(null)
+                setDragOverEventId(null)
+                setDragOverPosition(null)
+              }}
+              isDragOver={dragOverEventId === event.id}
+              dragOverPosition={dragOverPosition}
+              isDragging={draggedEventId === event.id}
+            />
           ))}
         </div>
       </div>

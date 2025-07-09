@@ -94,6 +94,7 @@ export const Calendar: React.FC = () => {
         <CalendarGrid
           currentDate={currentDate}
           events={events}
+          setEvents={setEvents} // <-- Add this line
           selectedDate={selectedDate}
           selectedColumn={selectedColumn}
           onDateClick={handleDateClick}
