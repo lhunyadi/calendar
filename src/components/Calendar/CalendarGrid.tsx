@@ -162,32 +162,45 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
   const [dragOverEventId, setDragOverEventId] = React.useState<number | null>(null)
   const [dragOverPosition, setDragOverPosition] = React.useState<'above' | 'below' | null>(null)
 
-  // Helper to reorder events within a date
-  const reorderEvents = (
-    date: Date,
+  // Helper to move/reorder events between dates
+  const moveOrReorderEvents = (
+    targetDate: Date,
     draggedId: number,
     targetId: number,
     position: 'above' | 'below'
   ) => {
     setEvents(prevEvents => {
-      // Only reorder events for the same date
-      const dayEvents = prevEvents.filter(e => isSameDay(e.date, date))
-      const otherEvents = prevEvents.filter(e => !isSameDay(e.date, date))
+      // Remove dragged event from its current date
+      let draggedEvent: Event | undefined;
+      const filteredEvents = prevEvents.filter(e => {
+        if (e.id === draggedId) {
+          draggedEvent = { ...e, date: targetDate }; // update date if moving
+          return false;
+        }
+        return true;
+      });
 
-      const draggedIdx = dayEvents.findIndex(e => e.id === draggedId)
-      const targetIdx = dayEvents.findIndex(e => e.id === targetId)
-      if (draggedIdx === -1 || targetIdx === -1 || draggedIdx === targetIdx) return prevEvents
+      if (!draggedEvent) return prevEvents;
 
-      // Remove dragged event
-      const [draggedEvent] = dayEvents.splice(draggedIdx, 1)
-      // Insert at new position
-      let insertIdx = position === 'above' ? targetIdx : targetIdx + 1
-      if (insertIdx > dayEvents.length) insertIdx = dayEvents.length
-      dayEvents.splice(insertIdx, 0, draggedEvent)
+      // Get events for the target date
+      const targetDayEvents = filteredEvents.filter(e => isSameDay(e.date, targetDate));
+      const otherEvents = filteredEvents.filter(e => !isSameDay(e.date, targetDate));
 
-      return [...otherEvents, ...dayEvents]
-    })
-  }
+      // Find target index in the target day's events
+      const targetIdx = targetDayEvents.findIndex(e => e.id === targetId);
+      if (targetIdx === -1) {
+        // If dropping into empty cell or not on an event, just append
+        return [...otherEvents, ...targetDayEvents, draggedEvent];
+      }
+
+      // Insert at correct position
+      let insertIdx = position === 'above' ? targetIdx : targetIdx + 1;
+      if (insertIdx > targetDayEvents.length) insertIdx = targetDayEvents.length;
+      targetDayEvents.splice(insertIdx, 0, draggedEvent);
+
+      return [...otherEvents, ...targetDayEvents];
+    });
+  };
 
   const renderDayContent = (
     day: Date,
@@ -196,7 +209,65 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
     currentColor: string
   ) => {
     return (
-      <div className="flex flex-col h-full w-full">
+      <div
+        className="flex flex-col h-full w-full"
+        role="button"
+        tabIndex={0}
+        aria-label="Drop event here"
+        onDragOver={e => {
+          e.preventDefault();
+          if (
+            draggedEventId !== null &&
+            e.target === e.currentTarget
+          ) {
+            setDragOverEventId(null);
+            setDragOverPosition(null);
+          }
+        }}
+        onDrop={e => {
+          if (
+            draggedEventId !== null &&
+            e.target === e.currentTarget
+          ) {
+            const draggedEvent = events.find(ev => ev.id === draggedEventId);
+            if (!draggedEvent) return;
+
+            setEvents(prevEvents => {
+              let updatedEvents = prevEvents.filter(ev => ev.id !== draggedEventId);
+              const newEvent = { ...draggedEvent, date: day };
+              const dayEvents = updatedEvents.filter(ev => isSameDay(ev.date, day));
+              const otherEvents = updatedEvents.filter(ev => !isSameDay(ev.date, day));
+              return [...otherEvents, ...dayEvents, newEvent];
+            });
+
+            setDraggedEventId(null);
+            setDragOverEventId(null);
+            setDragOverPosition(null);
+          }
+        }}
+        onKeyDown={e => {
+          // Optional: Support keyboard drop with Enter/Space
+          if (
+            (e.key === 'Enter' || e.key === ' ') &&
+            draggedEventId !== null
+          ) {
+            const draggedEvent = events.find(ev => ev.id === draggedEventId);
+            if (!draggedEvent) return;
+
+            setEvents(prevEvents => {
+              let updatedEvents = prevEvents.filter(ev => ev.id !== draggedEventId);
+              const newEvent = { ...draggedEvent, date: day };
+              const dayEvents = updatedEvents.filter(ev => isSameDay(ev.date, day));
+              const otherEvents = updatedEvents.filter(ev => !isSameDay(ev.date, day));
+              return [...otherEvents, ...dayEvents, newEvent];
+            });
+
+            setDraggedEventId(null);
+            setDragOverEventId(null);
+            setDragOverPosition(null);
+          }
+        }}
+      >
         <div className="p-1">
           <span
             className={`text-sm ${isSameDay(day, new Date()) ? 'rounded-full w-6 h-6 flex items-center justify-center inline-flex' : ''}`}
@@ -218,7 +289,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
             minHeight: 0,
           }}
         >
-          {dayEvents.map((event, idx) => (
+          {dayEvents.map((event) => (
             <CalendarEvent
               key={event.id}
               event={event}
@@ -230,26 +301,39 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
                 setDragOverPosition(null)
               }}
               onDragOver={e => {
-                e.preventDefault()
-                const rect = e.currentTarget.getBoundingClientRect()
-                const offset = e.clientY - rect.top
-                const position =
-                  offset < rect.height / 2 ? 'above' : 'below'
-                setDragOverEventId(event.id)
-                setDragOverPosition(position)
+                e.preventDefault();
+                const rect = e.currentTarget.getBoundingClientRect();
+                const offset = e.clientY - rect.top;
+                const position = offset < rect.height / 2 ? 'above' : 'below';
+                setDragOverEventId(event.id);
+                setDragOverPosition(position);
+              }}
+              onDragLeave={e => {
+                // Clear dragOverEventId/Position when leaving an event
+                if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+                setDragOverEventId(null);
+                setDragOverPosition(null);
               }}
               onDrop={e => {
-                e.preventDefault()
+                e.preventDefault();
+                e.stopPropagation(); // Prevents the parent date box onDrop from firing
                 if (
                   draggedEventId !== null &&
-                  dragOverEventId !== null &&
+                  dragOverEventId === event.id &&
                   draggedEventId !== dragOverEventId
                 ) {
-                  reorderEvents(day, draggedEventId, dragOverEventId, dragOverPosition!)
+                  const draggedEvent = events.find(ev => ev.id === draggedEventId);
+                  if (!draggedEvent) return;
+                  moveOrReorderEvents(
+                    day,
+                    draggedEventId,
+                    event.id,
+                    dragOverPosition!
+                  );
                 }
-                setDraggedEventId(null)
-                setDragOverEventId(null)
-                setDragOverPosition(null)
+                setDraggedEventId(null);
+                setDragOverEventId(null);
+                setDragOverPosition(null);
               }}
               isDragOver={dragOverEventId === event.id}
               dragOverPosition={dragOverPosition}
@@ -258,8 +342,8 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
           ))}
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   const renderCells = () => {
     const monthStart = startOfMonth(currentDate)

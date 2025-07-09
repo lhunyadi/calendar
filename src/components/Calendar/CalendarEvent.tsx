@@ -15,6 +15,7 @@ interface CalendarEventProps {
   onDragStart?: React.DragEventHandler<HTMLDivElement>;
   onDragEnd?: React.DragEventHandler<HTMLDivElement>;
   onDragOver?: React.DragEventHandler<HTMLDivElement>;
+  onDragLeave?: React.DragEventHandler<HTMLDivElement>; // <-- Add this line
   onDrop?: React.DragEventHandler<HTMLDivElement>;
   isDragOver?: boolean;
   dragOverPosition?: 'above' | 'below' | null;
@@ -27,6 +28,7 @@ export const CalendarEvent: React.FC<CalendarEventProps> = ({
   onDragStart,
   onDragEnd,
   onDragOver,
+  onDragLeave, // <-- Add this line
   onDrop,
   isDragOver,
   dragOverPosition,
@@ -76,6 +78,7 @@ export const CalendarEvent: React.FC<CalendarEventProps> = ({
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       onDragOver={onDragOver}
+      onDragLeave={onDragLeave} // <-- Add this line
       onDrop={onDrop}
       title={event.name}
     >
