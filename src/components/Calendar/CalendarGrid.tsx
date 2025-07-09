@@ -31,6 +31,11 @@ interface CalendarGridProps {
   onDateDoubleClick?: (date: Date) => void
 }
 
+// Utility filter functions to avoid deep nesting
+const filterOutEventById = (events: Event[], id: number) => events.filter(ev => ev.id !== id);
+const filterEventsByDay = (events: Event[], day: Date) => events.filter(ev => isSameDay(ev.date, day));
+const filterEventsNotByDay = (events: Event[], day: Date) => events.filter(ev => !isSameDay(ev.date, day));
+
 export const CalendarGrid: React.FC<CalendarGridProps> = ({
   currentDate,
   events,
@@ -208,65 +213,71 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
     dayEvents: Event[],
     currentColor: string
   ) => {
+    // Extracted handlers for accessibility and reduced nesting
+    const handleDayDragOver = (e: React.DragEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      if (
+        draggedEventId !== null &&
+        e.target === e.currentTarget
+      ) {
+        setDragOverEventId(null);
+        setDragOverPosition(null);
+      }
+    };
+
+    const handleDayDrop = (e: React.DragEvent<HTMLButtonElement>, day: Date) => {
+      if (
+        draggedEventId !== null &&
+        e.target === e.currentTarget
+      ) {
+        const draggedEvent = events.find(ev => ev.id === draggedEventId);
+        if (!draggedEvent) return;
+
+        setEvents(prevEvents => {
+          const updatedEvents = filterOutEventById(prevEvents, draggedEventId);
+          const newEvent = { ...draggedEvent, date: day };
+          const dayEvents = filterEventsByDay(updatedEvents, day);
+          const otherEvents = filterEventsNotByDay(updatedEvents, day);
+          return [...otherEvents, ...dayEvents, newEvent];
+        });
+
+        setDraggedEventId(null);
+        setDragOverEventId(null);
+        setDragOverPosition(null);
+      }
+    };
+
+    const handleDayKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, day: Date) => {
+      if (
+        (e.key === 'Enter' || e.key === ' ') &&
+        draggedEventId !== null
+      ) {
+        const draggedEvent = events.find(ev => ev.id === draggedEventId);
+        if (!draggedEvent) return;
+
+        setEvents(prevEvents => {
+          const updatedEvents = filterOutEventById(prevEvents, draggedEventId);
+          const newEvent = { ...draggedEvent, date: day };
+          const dayEvents = filterEventsByDay(updatedEvents, day);
+          const otherEvents = filterEventsNotByDay(updatedEvents, day);
+          return [...otherEvents, ...dayEvents, newEvent];
+        });
+
+        setDraggedEventId(null);
+        setDragOverEventId(null);
+        setDragOverPosition(null);
+      }
+    };
+
     return (
-      <div
-        className="flex flex-col h-full w-full"
-        role="button"
-        tabIndex={0}
+      <button
+        type="button"
+        className="flex flex-col h-full w-full text-left"
         aria-label="Drop event here"
-        onDragOver={e => {
-          e.preventDefault();
-          if (
-            draggedEventId !== null &&
-            e.target === e.currentTarget
-          ) {
-            setDragOverEventId(null);
-            setDragOverPosition(null);
-          }
-        }}
-        onDrop={e => {
-          if (
-            draggedEventId !== null &&
-            e.target === e.currentTarget
-          ) {
-            const draggedEvent = events.find(ev => ev.id === draggedEventId);
-            if (!draggedEvent) return;
-
-            setEvents(prevEvents => {
-              let updatedEvents = prevEvents.filter(ev => ev.id !== draggedEventId);
-              const newEvent = { ...draggedEvent, date: day };
-              const dayEvents = updatedEvents.filter(ev => isSameDay(ev.date, day));
-              const otherEvents = updatedEvents.filter(ev => !isSameDay(ev.date, day));
-              return [...otherEvents, ...dayEvents, newEvent];
-            });
-
-            setDraggedEventId(null);
-            setDragOverEventId(null);
-            setDragOverPosition(null);
-          }
-        }}
-        onKeyDown={e => {
-          // Optional: Support keyboard drop with Enter/Space
-          if (
-            (e.key === 'Enter' || e.key === ' ') &&
-            draggedEventId !== null
-          ) {
-            const draggedEvent = events.find(ev => ev.id === draggedEventId);
-            if (!draggedEvent) return;
-
-            setEvents(prevEvents => {
-              let updatedEvents = prevEvents.filter(ev => ev.id !== draggedEventId);
-              const newEvent = { ...draggedEvent, date: day };
-              const dayEvents = updatedEvents.filter(ev => isSameDay(ev.date, day));
-              const otherEvents = updatedEvents.filter(ev => !isSameDay(ev.date, day));
-              return [...otherEvents, ...dayEvents, newEvent];
-            });
-
-            setDraggedEventId(null);
-            setDragOverEventId(null);
-            setDragOverPosition(null);
-          }
-        }}
+        tabIndex={0}
+        onDragOver={handleDayDragOver}
+        onDrop={e => handleDayDrop(e, day)}
+        onKeyDown={e => handleDayKeyDown(e, day)}
       >
         <div className="p-1">
           <span
@@ -322,8 +333,6 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
                   dragOverEventId === event.id &&
                   draggedEventId !== dragOverEventId
                 ) {
-                  const draggedEvent = events.find(ev => ev.id === draggedEventId);
-                  if (!draggedEvent) return;
                   moveOrReorderEvents(
                     day,
                     draggedEventId,
@@ -341,7 +350,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
             />
           ))}
         </div>
-      </div>
+      </button>
     );
   };
 

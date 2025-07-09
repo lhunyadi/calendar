@@ -130,9 +130,9 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       // Calculate the exact RGB that would result from 25% brand color over white
       // This gives us the same visual color as the dark mode hover, but as a solid color
       const hex = brandColor.replace('#', '')
-      const r = parseInt(hex.substr(0, 2), 16)
-      const g = parseInt(hex.substr(2, 2), 16)
-      const b = parseInt(hex.substr(4, 2), 16)
+      const r = parseInt(hex.slice(0, 2), 16)
+      const g = parseInt(hex.slice(2, 4), 16)
+      const b = parseInt(hex.slice(4, 6), 16)
       
       // Blend 25% brand color with 75% white (255,255,255)
       const blendedR = Math.round(r * 0.25 + 255 * 0.75)
