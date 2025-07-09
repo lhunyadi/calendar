@@ -81,6 +81,25 @@ export const EventModal: React.FC<EventModalProps> = ({
     });
     onClose();
   };
+
+  // Extracted theme-dependent values for SonarQube compliance
+  const borderSectionColor = themeMode === 'dark' ? '#2C2D30' : '#e6e6e6';
+  const selectedBorderColor = themeMode === 'dark' ? '#fff' : '#000';
+
+  const getPriorityBackground = (idx: number) => {
+    if (idx === 1) {
+      return themeMode === 'dark'
+        ? `repeating-linear-gradient(135deg, ${selectedColor}33 0 8px, transparent 8px 16px)`
+        : `repeating-linear-gradient(135deg, ${selectedColor}22 0 8px, transparent 8px 16px)`;
+    }
+    if (idx === 2) {
+      return themeMode === 'dark'
+        ? `linear-gradient(90deg, ${selectedColor}33 0%, ${selectedColor}33 100%)`
+        : `linear-gradient(90deg, ${selectedColor}22 0%, ${selectedColor}22 100%)`;
+    }
+    return 'transparent';
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
@@ -154,7 +173,7 @@ export const EventModal: React.FC<EventModalProps> = ({
           >
             {/* Save header */}
             <div className={`flex items-center px-4 py-4`}
-                 style={{ borderBottom: `1px solid ${themeMode === 'dark' ? '#2C2D30' : '#e6e6e6'}` }}>
+                 style={{ borderBottom: `1px solid ${borderSectionColor}` }}>
               <button
                 className="flex flex-row items-center justify-center gap-2 rounded shadow text-sm px-3 py-1"
                 style={{
@@ -198,7 +217,7 @@ export const EventModal: React.FC<EventModalProps> = ({
             <div
               className="flex items-center gap-2 px-4"
               style={{
-                borderBottom: `1px solid ${themeMode === 'dark' ? '#2C2D30' : '#e6e6e6'}`,
+                borderBottom: `1px solid ${borderSectionColor}`,
                 minHeight: '2.25rem',
                 margin: 0,
                 background: 'none',
@@ -251,7 +270,7 @@ export const EventModal: React.FC<EventModalProps> = ({
             <div
               className="flex items-center gap-2 px-4"
               style={{
-                borderBottom: `1px solid ${themeMode === 'dark' ? '#2C2D30' : '#e6e6e6'}`,
+                borderBottom: `1px solid ${borderSectionColor}`,
                 minHeight: '2.25rem',
                 margin: 0,
                 background: 'none',
@@ -267,16 +286,7 @@ export const EventModal: React.FC<EventModalProps> = ({
             >
               {/* 3 rectangles visually separated, now as buttons with theme-aware outline */}
               {["Low", "Medium", "High"].map((label, idx) => {
-                let background = 'transparent';
-                if (idx === 1) {
-                  background = themeMode === 'dark'
-                    ? `repeating-linear-gradient(135deg, ${selectedColor}33 0 8px, transparent 8px 16px)`
-                    : `repeating-linear-gradient(135deg, ${selectedColor}22 0 8px, transparent 8px 16px)`;
-                } else if (idx === 2) {
-                  background = themeMode === 'dark'
-                    ? `linear-gradient(90deg, ${selectedColor}33 0%, ${selectedColor}33 100%)`
-                    : `linear-gradient(90deg, ${selectedColor}22 0%, ${selectedColor}22 100%)`;
-                }
+                const background = getPriorityBackground(idx);
                 const isSelected = selectedPriority === idx;
                 return (
                   <button
@@ -290,7 +300,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                       height: '1.25rem',
                       borderRadius: '0.375rem',
                       border: isSelected
-                        ? `1px solid ${themeMode === 'dark' ? '#fff' : '#000'}`
+                        ? `1px solid ${selectedBorderColor}`
                         : `1px solid ${selectedColor}`,
                       background,
                       outline: 'none',
@@ -307,7 +317,7 @@ export const EventModal: React.FC<EventModalProps> = ({
             </div>
             {/* Name section */}
             <div className="px-4 py-4 flex flex-col gap-1"
-                 style={{ borderBottom: `1px solid ${themeMode === 'dark' ? '#2C2D30' : '#e6e6e6'}` }}>
+                 style={{ borderBottom: `1px solid ${borderSectionColor}` }}>
               <input
                 ref={inputRef}
                 id="event-title-input"
@@ -323,7 +333,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                   fontSize: '0.875rem',
                   lineHeight: '1.25rem',
                   fontWeight: 400,
-                  borderColor: inputRef.current && document.activeElement === inputRef.current ? getColorHex() : (themeMode === 'dark' ? '#2C2D30' : '#e6e6e6'),
+                  borderColor: inputRef.current && document.activeElement === inputRef.current ? getColorHex() : borderSectionColor,
                   borderWidth: '1px',
                   borderStyle: 'solid'
                 }}
@@ -333,7 +343,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                 }}
                 onBlur={e => {
                   e.currentTarget.style.color = themeMode === 'dark' ? '#b0b3b8' : '#8a8a8a';
-                  e.currentTarget.style.borderColor = themeMode === 'dark' ? '#2C2D30' : '#e6e6e6';
+                  e.currentTarget.style.borderColor = borderSectionColor;
                 }}
               />
             </div>
@@ -350,7 +360,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                   fontSize: '0.875rem',
                   lineHeight: '1.25rem',
                   fontWeight: 400,
-                  borderColor: document.activeElement && document.activeElement.id === 'event-description-input' ? getColorHex() : (themeMode === 'dark' ? '#2C2D30' : '#e6e6e6'),
+                  borderColor: document.activeElement && document.activeElement.id === 'event-description-input' ? getColorHex() : borderSectionColor,
                   borderWidth: '1px',
                   borderStyle: 'solid',
                   minHeight: '12.5rem',
@@ -364,7 +374,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                 }}
                 onBlur={e => {
                   e.currentTarget.style.color = themeMode === 'dark' ? '#b0b3b8' : '#8a8a8a';
-                  e.currentTarget.style.borderColor = themeMode === 'dark' ? '#2C2D30' : '#e6e6e6';
+                  e.currentTarget.style.borderColor = borderSectionColor;
                 }}
               />
             </div>

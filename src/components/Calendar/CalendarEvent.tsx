@@ -12,11 +12,11 @@ interface Event {
 interface CalendarEventProps {
   event: Event;
   draggable?: boolean;
-  onDragStart?: React.DragEventHandler<HTMLDivElement>;
-  onDragEnd?: React.DragEventHandler<HTMLDivElement>;
-  onDragOver?: React.DragEventHandler<HTMLDivElement>;
-  onDragLeave?: React.DragEventHandler<HTMLDivElement>; // <-- Add this line
-  onDrop?: React.DragEventHandler<HTMLDivElement>;
+  onDragStart?: React.DragEventHandler<HTMLButtonElement>;
+  onDragEnd?: React.DragEventHandler<HTMLButtonElement>;
+  onDragOver?: React.DragEventHandler<HTMLButtonElement>;
+  onDragLeave?: React.DragEventHandler<HTMLButtonElement>;
+  onDrop?: React.DragEventHandler<HTMLButtonElement>;
   isDragOver?: boolean;
   dragOverPosition?: 'above' | 'below' | null;
   isDragging?: boolean;
@@ -28,7 +28,7 @@ export const CalendarEvent: React.FC<CalendarEventProps> = ({
   onDragStart,
   onDragEnd,
   onDragOver,
-  onDragLeave, // <-- Add this line
+  onDragLeave,
   onDrop,
   isDragOver,
   dragOverPosition,
@@ -58,7 +58,8 @@ export const CalendarEvent: React.FC<CalendarEventProps> = ({
       : `1px solid ${event.color}`;
 
   return (
-    <div
+    <button
+      type="button"
       className="relative text-xs p-1 rounded truncate cursor-pointer hover:opacity-90 transition-opacity flex items-center w-full box-border"
       style={{
         background,
@@ -78,11 +79,19 @@ export const CalendarEvent: React.FC<CalendarEventProps> = ({
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       onDragOver={onDragOver}
-      onDragLeave={onDragLeave} // <-- Add this line
+      onDragLeave={onDragLeave}
       onDrop={onDrop}
       title={event.name}
+      aria-label={`Event: ${event.name}`}
+      tabIndex={0}
+      onKeyDown={e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          // Example: open event details or start editing
+        }
+      }}
     >
       <span className="relative z-10 w-full truncate">{event.name}</span>
-    </div>
+    </button>
   );
 }
