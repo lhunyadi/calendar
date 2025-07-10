@@ -22,6 +22,7 @@ export const Calendar: React.FC = () => {
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalDate, setModalDate] = useState<Date | null>(null)
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null)
 
   const goToPreviousMonth = () => {
     setCurrentDate(subMonths(currentDate, 1))
@@ -58,23 +59,46 @@ export const Calendar: React.FC = () => {
     setIsModalOpen(true)
   }
 
-  const handleModalClose = () => {
-    setIsModalOpen(false)
-    setModalDate(null)
+  // Single click on event: open modal for editing
+  const handleEventClick = (event: Event) => {
+    setEditingEvent(event)
+    setModalDate(event.date)
+    setIsModalOpen(true)
   }
 
   // Add event to state
   const handleEventSave = (event: { name: string; color: string; priority: number; date: Date }) => {
-    setEvents(prev => [
-      ...prev,
-      {
-        id: Date.now() + Math.floor(Math.random() * 10000),
-        name: event.name,
-        color: event.color,
-        priority: event.priority,
-        date: event.date,
-      },
-    ])
+    setEvents(prev => {
+      if (editingEvent) {
+        // Update existing event
+        return prev.map(ev =>
+          ev.id === editingEvent.id
+            ? { ...ev, ...event }
+            : ev
+        )
+      } else {
+        // Add new event
+        return [
+          ...prev,
+          {
+            id: Date.now() + Math.floor(Math.random() * 10000),
+            name: event.name,
+            color: event.color,
+            priority: event.priority,
+            date: event.date,
+          },
+        ]
+      }
+    })
+    setEditingEvent(null)
+    setIsModalOpen(false)
+    setModalDate(null)
+  }
+
+  const handleModalClose = () => {
+    setIsModalOpen(false)
+    setModalDate(null)
+    setEditingEvent(null)
   }
 
   return (
@@ -94,12 +118,13 @@ export const Calendar: React.FC = () => {
         <CalendarGrid
           currentDate={currentDate}
           events={events}
-          setEvents={setEvents} // <-- Add this line
+          setEvents={setEvents}
           selectedDate={selectedDate}
           selectedColumn={selectedColumn}
           onDateClick={handleDateClick}
           onDayHeaderClick={handleDayHeaderClick}
           onDateDoubleClick={handleDateDoubleClick}
+          onEventClick={handleEventClick} // <-- pass this prop
         />
       </div>
 
@@ -109,6 +134,7 @@ export const Calendar: React.FC = () => {
         onClose={handleModalClose}
         selectedDate={modalDate}
         onSave={handleEventSave}
+        editingEvent={editingEvent} // <-- pass this prop
       />
     </div>
   )

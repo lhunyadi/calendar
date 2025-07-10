@@ -20,6 +20,7 @@ interface CalendarEventProps {
   isDragOver?: boolean;
   dragOverPosition?: 'above' | 'below' | null;
   isDragging?: boolean;
+  onClick?: () => void; // <-- add this
 }
 
 export const CalendarEvent: React.FC<CalendarEventProps> = ({
@@ -33,6 +34,7 @@ export const CalendarEvent: React.FC<CalendarEventProps> = ({
   isDragOver,
   dragOverPosition,
   isDragging,
+  onClick, // <-- add this
 }) => {
   const { getColorHex, getBgColor, themeMode } = useTheme();
 
@@ -62,7 +64,7 @@ export const CalendarEvent: React.FC<CalendarEventProps> = ({
   return (
     <button
       type="button"
-      className="relative text-xs p-1 rounded truncate cursor-pointer hover:opacity-90 transition-opacity flex items-center w-full box-border"
+      className="relative text-xs p-1 rounded truncate cursor-pointer hover:opacity-90 transition-opacity flex items-center w-full box-border group"
       style={{
         background,
         borderLeft: `1px solid ${event.color}`,
@@ -76,6 +78,7 @@ export const CalendarEvent: React.FC<CalendarEventProps> = ({
         opacity: isDragging ? 0.5 : 1,
         zIndex: isDragging ? 10 : undefined,
         transition: 'border-color 0.15s',
+        overflow: 'hidden', // ensure overlay stays inside
       }}
       draggable={draggable}
       onDragStart={onDragStart}
@@ -91,7 +94,19 @@ export const CalendarEvent: React.FC<CalendarEventProps> = ({
           // Example: open event details or start editing
         }
       }}
+      onClick={onClick}
     >
+      {/* Highlight overlay on hover */}
+      <span
+        className="pointer-events-none absolute inset-0 rounded z-20 opacity-0 group-hover:opacity-100 transition-opacity"
+        style={{
+          background:
+            themeMode === 'dark'
+              ? 'rgba(255,255,255,0.08)'
+              : 'rgba(0,0,0,0.06)',
+          // Slightly brighter for dark, slightly darker for light
+        }}
+      />
       <span className="relative z-10 w-full truncate">{event.name}</span>
     </button>
   );

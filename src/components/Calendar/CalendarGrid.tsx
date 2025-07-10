@@ -29,6 +29,7 @@ interface CalendarGridProps {
   onDateClick: (date: Date) => void
   onDayHeaderClick: (date: Date) => void
   onDateDoubleClick?: (date: Date) => void
+  onEventClick?: (event: Event) => void; // <-- add this
 }
 
 // Utility filter functions to avoid deep nesting
@@ -45,6 +46,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
   onDateClick,
   onDayHeaderClick,
   onDateDoubleClick,
+  onEventClick,
 }) => {
   const { getColorHex, getBgColor, getCalendarOutMonthColor, getTextColor, themeMode, getTodayTextColor, getHoverColor } = useTheme()
   
@@ -167,20 +169,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
   const [dragOverEventId, setDragOverEventId] = React.useState<number | null>(null)
   const [dragOverPosition, setDragOverPosition] = React.useState<'above' | 'below' | null>(null)
 
-  React.useEffect(() => {
-    const clearDragState = () => {
-      setDragOverEventId(null);
-      setDragOverPosition(null);
-    };
-    window.addEventListener('dragend', clearDragState);
-    window.addEventListener('drop', clearDragState);
-    return () => {
-      window.removeEventListener('dragend', clearDragState);
-      window.removeEventListener('drop', clearDragState);
-    };
-  }, []);
-
-  // Helper to move/reorder events between dates
+  // Move or reorder events
   const moveOrReorderEvents = (
     targetDate: Date,
     draggedId: number,
@@ -188,34 +177,22 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
     position: 'above' | 'below'
   ) => {
     setEvents(prevEvents => {
-      // Remove dragged event from its current date
       let draggedEvent: Event | undefined;
       const filteredEvents = prevEvents.filter(e => {
         if (e.id === draggedId) {
-          draggedEvent = { ...e, date: targetDate }; // update date if moving
+          draggedEvent = { ...e, date: targetDate };
           return false;
         }
         return true;
       });
-
       if (!draggedEvent) return prevEvents;
-
-      // Get events for the target date
       const targetDayEvents = filteredEvents.filter(e => isSameDay(e.date, targetDate));
       const otherEvents = filteredEvents.filter(e => !isSameDay(e.date, targetDate));
-
-      // Find target index in the target day's events
       const targetIdx = targetDayEvents.findIndex(e => e.id === targetId);
-      if (targetIdx === -1) {
-        // If dropping into empty cell or not on an event, just append
-        return [...otherEvents, ...targetDayEvents, draggedEvent];
-      }
-
-      // Insert at correct position
+      if (targetIdx === -1) return [...otherEvents, ...targetDayEvents, draggedEvent];
       let insertIdx = position === 'above' ? targetIdx : targetIdx + 1;
       if (insertIdx > targetDayEvents.length) insertIdx = targetDayEvents.length;
       targetDayEvents.splice(insertIdx, 0, draggedEvent);
-
       return [...otherEvents, ...targetDayEvents];
     });
   };
@@ -225,143 +202,84 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
     formattedDate: string,
     dayEvents: Event[],
     currentColor: string
-  ) => {
-    // Extracted handlers for accessibility and reduced nesting
-    const handleDayDragOver = (e: React.DragEvent<HTMLButtonElement>) => {
-      e.preventDefault();
-      // Always clear previous highlight before setting new
-      setDragOverEventId(null);
-      setDragOverPosition(null);
-      // If you want to highlight the cell itself, set a cell-level state here
-    };
-
-    const handleDayDrop = (e: React.DragEvent<HTMLButtonElement>, day: Date) => {
-      if (
-        draggedEventId !== null &&
-        e.target === e.currentTarget
-      ) {
-        const draggedEvent = events.find(ev => ev.id === draggedEventId);
-        if (!draggedEvent) return;
-
-        setEvents(prevEvents => {
-          const updatedEvents = filterOutEventById(prevEvents, draggedEventId);
-          const newEvent = { ...draggedEvent, date: day };
-          const dayEvents = filterEventsByDay(updatedEvents, day);
-          const otherEvents = filterEventsNotByDay(updatedEvents, day);
-          return [...otherEvents, ...dayEvents, newEvent];
-        });
-
-        setDraggedEventId(null);
-        setDragOverEventId(null);
-        setDragOverPosition(null);
-      }
-    };
-
-    const handleDayKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, day: Date) => {
-      if (
-        (e.key === 'Enter' || e.key === ' ') &&
-        draggedEventId !== null
-      ) {
-        const draggedEvent = events.find(ev => ev.id === draggedEventId);
-        if (!draggedEvent) return;
-
-        setEvents(prevEvents => {
-          const updatedEvents = filterOutEventById(prevEvents, draggedEventId);
-          const newEvent = { ...draggedEvent, date: day };
-          const dayEvents = filterEventsByDay(updatedEvents, day);
-          const otherEvents = filterEventsNotByDay(updatedEvents, day);
-          return [...otherEvents, ...dayEvents, newEvent];
-        });
-
-        setDraggedEventId(null);
-        setDragOverEventId(null);
-        setDragOverPosition(null);
-      }
-    };
-
-    return (
-      <button
-        type="button"
-        className="flex flex-col h-full w-full text-left"
-        aria-label="Drop event here"
-        tabIndex={0}
-        onDragOver={handleDayDragOver}
-        onDrop={e => handleDayDrop(e, day)}
-        onKeyDown={e => handleDayKeyDown(e, day)}
-      >
-        <div className="p-1">
-          <span
-            className={`text-sm ${isSameDay(day, new Date()) ? 'rounded-full w-6 h-6 flex items-center justify-center inline-flex' : ''}`}
-            style={
-              isSameDay(day, new Date())
-                ? { backgroundColor: currentColor, color: getTodayTextColor() }
-                : {}
-            }
-          >
-            {formattedDate}
-          </span>
-        </div>
-        <div
-          className="flex flex-col gap-1 w-full overflow-y-auto custom-scrollbar pb-2 mt-2.5"
-          style={{
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-            maxHeight: '7.2rem',
-            minHeight: 0,
-          }}
+  ) => (
+    <div
+      className="flex flex-col h-full w-full text-left"
+      aria-label="Drop event here"
+      tabIndex={0}
+    >
+      <div className="p-1">
+        <span
+          className={`text-sm ${isSameDay(day, new Date()) ? 'rounded-full w-6 h-6 flex items-center justify-center inline-flex' : ''}`}
+          style={
+            isSameDay(day, new Date())
+              ? { backgroundColor: currentColor, color: getTodayTextColor() }
+              : {}
+          }
         >
-          {dayEvents.map((event) => (
-            <CalendarEvent
-              key={event.id}
-              event={event}
-              draggable
-              onDragStart={() => setDraggedEventId(event.id)}
-              onDragEnd={() => {
-                setDraggedEventId(null)
-                setDragOverEventId(null)
-                setDragOverPosition(null)
-              }}
-              onDragOver={e => {
-                e.preventDefault();
-                const rect = e.currentTarget.getBoundingClientRect();
-                const offset = e.clientY - rect.top;
-                const position = offset < rect.height / 2 ? 'above' : 'below';
-                // Only set the new highlight (this will replace the old one)
-                setDragOverEventId(event.id);
-                setDragOverPosition(position);
-              }}
-              onDragLeave={() => {
-                setDragOverEventId(null);
-                setDragOverPosition(null);
-              }}
-              onDrop={e => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (
-                  draggedEventId !== null &&
-                  dragOverEventId === event.id &&
-                  draggedEventId !== dragOverEventId
-                ) {
-                  moveOrReorderEvents(
-                    day,
-                    draggedEventId,
-                    event.id,
-                    dragOverPosition!
-                  );
-                }
-                setDraggedEventId(null);
-                setDragOverEventId(null);
-                setDragOverPosition(null);
-              }}
-              isDragOver={dragOverEventId === event.id}
-              dragOverPosition={dragOverPosition}
-              isDragging={draggedEventId === event.id}
-            />
-          ))}
-        </div>
-      </button>
-    );
-  };
+          {formattedDate}
+        </span>
+      </div>
+      <div
+        className="flex flex-col gap-1 w-full overflow-y-auto custom-scrollbar pb-2 mt-2.5"
+        style={{
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          maxHeight: '7.2rem',
+          minHeight: 0,
+        }}
+      >
+        {dayEvents.map((event) => (
+          <CalendarEvent
+            key={event.id}
+            event={event}
+            draggable
+            onDragStart={() => setDraggedEventId(event.id)}
+            onDragEnd={() => {
+              setDraggedEventId(null)
+              setDragOverEventId(null)
+              setDragOverPosition(null)
+            }}
+            onDragOver={e => {
+              e.preventDefault();
+              const rect = e.currentTarget.getBoundingClientRect();
+              const offset = e.clientY - rect.top;
+              const position = offset < rect.height / 2 ? 'above' : 'below';
+              setDragOverEventId(event.id);
+              setDragOverPosition(position);
+            }}
+            onDragLeave={() => {
+              setDragOverEventId(null);
+              setDragOverPosition(null);
+            }}
+            onDrop={e => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (
+                draggedEventId !== null &&
+                dragOverEventId === event.id &&
+                draggedEventId !== dragOverEventId
+              ) {
+                moveOrReorderEvents(
+                  day,
+                  draggedEventId,
+                  event.id,
+                  dragOverPosition!
+                );
+              }
+              setDraggedEventId(null);
+              setDragOverEventId(null);
+              setDragOverPosition(null);
+            }}
+            isDragOver={dragOverEventId === event.id}
+            dragOverPosition={dragOverPosition}
+            isDragging={draggedEventId === event.id}
+            onClick={() => onEventClick?.(event)}
+          />
+        ))}
+      </div>
+    </div>
+  );
 
   const renderCells = () => {
     const monthStart = startOfMonth(currentDate)
@@ -395,7 +313,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
         }
 
         days.push(
-          <button
+          <div
             key={day.toString()}
             className={cellClasses}
             style={finalCellStyle}
@@ -411,9 +329,32 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
               target.style.backgroundColor = finalCellStyle.backgroundColor ?? ''
               target.style.transition = 'background-color 0.2s ease'
             }}
+            onDragOver={e => {
+              e.preventDefault();
+              if (draggedEventId !== null && dragOverEventId === null) {
+                // Optionally, you could add a visual indicator here
+              }
+            }}
+            onDrop={e => {
+              e.preventDefault();
+              if (draggedEventId !== null && dragOverEventId === null) {
+                const draggedEvent = events.find(ev => ev.id === draggedEventId);
+                if (!draggedEvent) return;
+                setEvents(prevEvents => {
+                  let updatedEvents = prevEvents.filter(ev => ev.id !== draggedEventId);
+                  const newEvent = { ...draggedEvent, date: cloneDay };
+                  const dayEvents = updatedEvents.filter(ev => isSameDay(ev.date, cloneDay));
+                  const otherEvents = updatedEvents.filter(ev => !isSameDay(ev.date, cloneDay));
+                  return [...otherEvents, ...dayEvents, newEvent];
+                });
+                setDraggedEventId(null);
+                setDragOverEventId(null);
+                setDragOverPosition(null);
+              }
+            }}
           >
             {renderDayContent(day, formattedDate, dayEvents, currentColor)}
-          </button>,
+          </div>,
         )
         day = addDays(day, 1)
       }

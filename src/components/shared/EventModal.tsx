@@ -6,6 +6,7 @@ interface EventModalProps {
   onClose: () => void
   selectedDate: Date | null
   onSave: (event: { name: string; color: string; priority: number; date: Date }) => void;
+  editingEvent?: { name: string; color: string; priority: number } | null;
 }
 
 export const EventModal: React.FC<EventModalProps> = ({
@@ -13,6 +14,7 @@ export const EventModal: React.FC<EventModalProps> = ({
   onClose,
   selectedDate,
   onSave,
+  editingEvent,
 }) => {
   const [eventName, setEventName] = React.useState("");
   const { getBgColor, getTextColor, getColorHex, getSurfaceColor, themeMode } = useTheme();
@@ -47,12 +49,16 @@ export const EventModal: React.FC<EventModalProps> = ({
 
   // Reset eventName and selectedColor when modal closes
   useEffect(() => {
-    if (!isOpen) {
+    if (isOpen && editingEvent) {
+      setEventName(editingEvent.name);
+      setSelectedColor(editingEvent.color);
+      setSelectedPriority(editingEvent.priority);
+    } else if (isOpen && !editingEvent) {
       setEventName("");
       setSelectedColor(highlightColor);
       setSelectedPriority(-1);
     }
-  }, [isOpen, highlightColor]);
+  }, [isOpen, editingEvent, highlightColor]);
 
   // Escape closes modal: listen on document when open
   useEffect(() => {
