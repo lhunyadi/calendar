@@ -34,14 +34,16 @@ export const CalendarEvent: React.FC<CalendarEventProps> = ({
   dragOverPosition,
   isDragging,
 }) => {
-  const { getColorHex } = useTheme();
+  const { getColorHex, getBgColor } = useTheme();
 
-  // Priority style: Low = border only, Medium = diagonal, High = solid
-  let background = 'transparent';
+  // Extracted background assignment for SonarQube S3358
+  let background: string;
   if (event.priority === 1) {
-    background = `repeating-linear-gradient(135deg, ${event.color}33 0 8px, transparent 8px 16px)`;
+    background = `repeating-linear-gradient(135deg, ${event.color}33 0 8px, transparent 8px 16px), ${getBgColor()}`;
   } else if (event.priority === 2) {
-    background = `linear-gradient(90deg, ${event.color}33 0%, ${event.color}33 100%)`;
+    background = `linear-gradient(90deg, ${event.color}33 0%, ${event.color}33 100%), ${getBgColor()}`;
+  } else {
+    background = getBgColor();
   }
 
   // Highlight color for drag-over

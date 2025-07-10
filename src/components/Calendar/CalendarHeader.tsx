@@ -122,27 +122,40 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
           {/* Search Icon Button */}
           <button
             ref={searchButtonRef}
-            className="relative p-1 rounded flex items-center justify-center"
-            style={{ background: 'none', border: 'none' }}
+            type="button"
+            className="p-0 m-0 bg-transparent border-none cursor-pointer flex items-center"
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              margin: 0,
+              lineHeight: 1,
+            }}
             tabIndex={0}
             aria-label="Search"
+            onMouseEnter={e => {
+              const icon = e.currentTarget.querySelector('.material-icons');
+              if (icon instanceof HTMLElement) {
+                icon.style.color = getColorHex();
+                icon.style.transition = 'color 0.2s ease';
+              }
+            }}
+            onMouseLeave={e => {
+              const icon = e.currentTarget.querySelector('.material-icons');
+              if (icon instanceof HTMLElement) {
+                icon.style.color = getButtonIconColor();
+                icon.style.transition = 'color 0.2s ease';
+              }
+            }}
             onClick={() => setIsSearchOpen(v => !v)}
           >
             <span
-              className="material-icons cursor-pointer"
+              className="material-icons"
               style={{
                 fontSize: 20,
                 color: getButtonIconColor(),
                 verticalAlign: 'middle',
                 transition: 'color 0.2s ease'
-              }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLElement).style.color = getColorHex();
-                (e.currentTarget as HTMLElement).style.transition = 'color 0.2s ease';
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLElement).style.color = getButtonIconColor();
-                (e.currentTarget as HTMLElement).style.transition = 'color 0.2s ease';
               }}
             >
               search
@@ -225,22 +238,11 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
         <div className="flex items-center space-x-2">
           <button
             onClick={onToday}
-            className="px-3 py-1 rounded text-sm"
-            style={{ 
-              backgroundColor: getColorHex(),
-              color: getTextColor()
-            }}
-            onMouseEnter={(e) => {
-              const target = e.currentTarget as HTMLElement
-              const currentColor = getColorHex()
-              target.style.backgroundColor = `${currentColor}DD` // Slightly darker on hover for buttons
-              target.style.transition = 'background-color 0.2s ease' // Only transition on hover
-            }}
-            onMouseLeave={(e) => {
-              const target = e.currentTarget as HTMLElement
-              target.style.backgroundColor = getColorHex() // Back to original
-              target.style.transition = 'background-color 0.2s ease' // Only transition on hover
-            }}
+            className={`
+              px-3 py-1 rounded text-sm
+              transition-colors
+              ${themeMode === 'dark' ? 'bg-brand-blue text-brand-white hover:bg-brand-blue/90 hover:text-brand-black' : 'bg-brand-blue text-brand-black hover:bg-brand-blue/90 hover:text-brand-white'}
+            `}
           >
             Today
           </button>
