@@ -34,7 +34,7 @@ export const CalendarEvent: React.FC<CalendarEventProps> = ({
   dragOverPosition,
   isDragging,
 }) => {
-  const { getColorHex, getBgColor } = useTheme();
+  const { getColorHex, getBgColor, themeMode } = useTheme();
 
   // Extracted background assignment for SonarQube S3358
   let background: string;
@@ -69,7 +69,7 @@ export const CalendarEvent: React.FC<CalendarEventProps> = ({
         borderRight: `1px solid ${event.color}`,
         borderTop,
         borderBottom,
-        color: '#fff',
+        color: themeMode === 'dark' ? '#fff' : '#000',
         minHeight: '2.2rem',
         fontWeight: 500,
         maxWidth: '100%',
@@ -83,7 +83,6 @@ export const CalendarEvent: React.FC<CalendarEventProps> = ({
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={onDrop}
-      title={event.name}
       aria-label={`Event: ${event.name}`}
       tabIndex={0}
       onKeyDown={e => {

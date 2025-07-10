@@ -167,6 +167,19 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
   const [dragOverEventId, setDragOverEventId] = React.useState<number | null>(null)
   const [dragOverPosition, setDragOverPosition] = React.useState<'above' | 'below' | null>(null)
 
+  React.useEffect(() => {
+    const clearDragState = () => {
+      setDragOverEventId(null);
+      setDragOverPosition(null);
+    };
+    window.addEventListener('dragend', clearDragState);
+    window.addEventListener('drop', clearDragState);
+    return () => {
+      window.removeEventListener('dragend', clearDragState);
+      window.removeEventListener('drop', clearDragState);
+    };
+  }, []);
+
   // Helper to move/reorder events between dates
   const moveOrReorderEvents = (
     targetDate: Date,
@@ -216,13 +229,10 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
     // Extracted handlers for accessibility and reduced nesting
     const handleDayDragOver = (e: React.DragEvent<HTMLButtonElement>) => {
       e.preventDefault();
-      if (
-        draggedEventId !== null &&
-        e.target === e.currentTarget
-      ) {
-        setDragOverEventId(null);
-        setDragOverPosition(null);
-      }
+      // Always clear previous highlight before setting new
+      setDragOverEventId(null);
+      setDragOverPosition(null);
+      // If you want to highlight the cell itself, set a cell-level state here
     };
 
     const handleDayDrop = (e: React.DragEvent<HTMLButtonElement>, day: Date) => {
@@ -316,18 +326,17 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
                 const rect = e.currentTarget.getBoundingClientRect();
                 const offset = e.clientY - rect.top;
                 const position = offset < rect.height / 2 ? 'above' : 'below';
+                // Only set the new highlight (this will replace the old one)
                 setDragOverEventId(event.id);
                 setDragOverPosition(position);
               }}
-              onDragLeave={e => {
-                // Clear dragOverEventId/Position when leaving an event
-                if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+              onDragLeave={() => {
                 setDragOverEventId(null);
                 setDragOverPosition(null);
               }}
               onDrop={e => {
                 e.preventDefault();
-                e.stopPropagation(); // Prevents the parent date box onDrop from firing
+                e.stopPropagation();
                 if (
                   draggedEventId !== null &&
                   dragOverEventId === event.id &&

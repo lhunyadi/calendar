@@ -28,7 +28,8 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   // Focus input when menu opens
   useEffect(() => {
     if (isSearchOpen && searchInputRef.current) {
-      searchInputRef.current.focus()
+      searchInputRef.current.focus();
+      setSearchValue(''); // Clear search box every time it opens
     }
   }, [isSearchOpen])
 
@@ -81,22 +82,14 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
         }}
       >
         <div className="flex items-center space-x-2 relative">
-          {isPaletteOpen && (
-            <ColorPalette 
-              isOpen={isPaletteOpen} 
-              onClose={() => setIsPaletteOpen(false)}
-              paletteButtonRef={paletteButtonRef}
-            />
-          )}
           {/* Search Menu */}
           {isSearchOpen && (
             <div
-              className="absolute left-0 z-20 flex items-center px-4 py-2 shadow-lg rounded-l-full rounded-r-full"
+              className="absolute left-0 z-20 flex items-center px-2 py-2 rounded-l-full rounded-r-full"
               style={{
                 minWidth: '200px',
-                marginLeft: '-220px',
-                backgroundColor: getSurfaceColor(), // Match header background
-                border: `1px solid ${themeMode === 'dark' ? '#2C2D30' : '#e6e6e6'}`, // Match grid border
+                marginLeft: '-200px', // reduced from -220px to move closer to the icon
+                backgroundColor: getSurfaceColor(),
                 transition: 'box-shadow 0.2s',
               }}
             >
@@ -123,7 +116,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
           <button
             ref={searchButtonRef}
             type="button"
-            className="p-0 m-0 bg-transparent border-none cursor-pointer flex items-center"
+            className="p-1 rounded flex items-center justify-center transition-colors"
             style={{
               background: 'none',
               border: 'none',
@@ -134,33 +127,40 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
             tabIndex={0}
             aria-label="Search"
             onMouseEnter={e => {
-              const icon = e.currentTarget.querySelector('.material-icons');
+              const icon = e.currentTarget.querySelector('.material-symbols-outlined');
               if (icon instanceof HTMLElement) {
                 icon.style.color = getColorHex();
                 icon.style.transition = 'color 0.2s ease';
               }
+              e.currentTarget.style.backgroundColor = 'transparent';
             }}
             onMouseLeave={e => {
-              const icon = e.currentTarget.querySelector('.material-icons');
+              const icon = e.currentTarget.querySelector('.material-symbols-outlined');
               if (icon instanceof HTMLElement) {
                 icon.style.color = getButtonIconColor();
                 icon.style.transition = 'color 0.2s ease';
               }
+              e.currentTarget.style.backgroundColor = 'transparent';
             }}
             onClick={() => setIsSearchOpen(v => !v)}
           >
-            <span
-              className="material-icons"
-              style={{
-                fontSize: 20,
-                color: getButtonIconColor(),
-                verticalAlign: 'middle',
-                transition: 'color 0.2s ease'
-              }}
-            >
+            <span className="material-symbols-outlined" style={{
+              fontSize: 20,
+              color: getButtonIconColor(),
+              verticalAlign: 'middle',
+              transition: 'color 0.2s ease'
+            }}>
               search
             </span>
           </button>
+          {/* Color Palette (should appear to the right of the search button) */}
+          {isPaletteOpen && (
+            <ColorPalette 
+              isOpen={isPaletteOpen} 
+              onClose={() => setIsPaletteOpen(false)}
+              paletteButtonRef={paletteButtonRef}
+            />
+          )}
           {/* Color Palette Button */}
           <button
             ref={paletteButtonRef}
