@@ -6,7 +6,8 @@ interface EventModalProps {
   onClose: () => void
   selectedDate: Date | null
   onSave: (event: { name: string; color: string; priority: number; date: Date }) => void;
-  editingEvent?: { name: string; color: string; priority: number } | null;
+  editingEvent?: { name: string; color: string; priority: number; id: number } | null;
+  onDelete?: (eventId: number) => void; // <-- add this prop
 }
 
 export const EventModal: React.FC<EventModalProps> = ({
@@ -15,6 +16,7 @@ export const EventModal: React.FC<EventModalProps> = ({
   selectedDate,
   onSave,
   editingEvent,
+  onDelete, // <-- add this
 }) => {
   const [eventName, setEventName] = React.useState("");
   const { getBgColor, getTextColor, getColorHex, getSurfaceColor, themeMode } = useTheme();
@@ -86,6 +88,13 @@ export const EventModal: React.FC<EventModalProps> = ({
       date: selectedDate,
     });
     onClose();
+  };
+
+  const handleDelete = () => {
+    if (editingEvent && onDelete) {
+      onDelete(editingEvent.id);
+      onClose();
+    }
   };
 
   // Extracted theme-dependent values for SonarQube compliance
@@ -177,14 +186,14 @@ export const EventModal: React.FC<EventModalProps> = ({
               minHeight: '0',
             }}
           >
-            {/* Save header */}
-            <div className={`flex items-center px-4 py-4`}
+            {/* Save/Delete header */}
+            <div className={`flex items-center px-4 py-4 gap-2`}
                  style={{ borderBottom: `1px solid ${borderSectionColor}` }}>
               <button
                 className="flex flex-row items-center justify-center gap-2 rounded shadow text-sm px-3 py-1"
                 style={{
                   backgroundColor: getColorHex(),
-                  color: themeMode === 'dark' ? '#fff' : '#000',
+                  color: '#fff',
                   border: 'none',
                   outline: 'none',
                   height: '2.25rem',
@@ -199,25 +208,89 @@ export const EventModal: React.FC<EventModalProps> = ({
                   pointerEvents: (!eventName.trim() || !selectedColor || selectedPriority === -1) ? 'none' : 'auto',
                 }}
                 onMouseEnter={e => {
-                  const target = e.currentTarget as HTMLElement;
-                  const currentColor = getColorHex();
-                  target.style.backgroundColor = `${currentColor}DD`;
-                  target.style.color = themeMode === 'dark' ? '#000' : '#fff';
-                  target.style.transition = 'color 0.2s, background 0.2s';
+                  const icon = e.currentTarget.querySelector('.material-symbols-outlined');
+                  if (icon instanceof HTMLElement) {
+                    icon.style.color = themeMode === 'dark' ? '#fff' : '#000';
+                  }
                 }}
                 onMouseLeave={e => {
-                  const target = e.currentTarget as HTMLElement;
-                  target.style.backgroundColor = getColorHex();
-                  target.style.color = themeMode === 'dark' ? '#fff' : '#000';
-                  target.style.transition = 'color 0.2s, background 0.2s';
+                  const icon = e.currentTarget.querySelector('.material-symbols-outlined');
+                  if (icon instanceof HTMLElement) {
+                    icon.style.color = themeMode === 'dark' ? '#000' : '#fff';
+                  }
                 }}
                 title="Save"
                 onClick={handleSave}
                 disabled={!eventName.trim() || !selectedColor || selectedPriority === -1}
                 aria-disabled={!eventName.trim() || !selectedColor || selectedPriority === -1}
               >
-                <span style={{ fontSize: '0.875rem', lineHeight: '1.25rem', display: 'inline' }}>Save</span>
+                <span
+                  className="material-symbols-outlined"
+                  style={{
+                    fontSize: '1.25rem',
+                    verticalAlign: 'middle',
+                    color: themeMode === 'dark' ? '#000' : '#fff',
+                    lineHeight: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24",
+                    transition: 'color 0.2s',
+                  }}
+                  data-filled="true"
+                >
+                  save
+                </span>
               </button>
+              {editingEvent && onDelete && (
+                <button
+                  className="flex items-center justify-center rounded shadow text-sm px-3 py-1"
+                  style={{
+                    backgroundColor: '#fe2b29', // Always red, regardless of theme
+                    border: 'none',
+                    outline: 'none',
+                    height: '2.25rem',
+                    minWidth: '2.25rem',
+                    fontSize: '0.875rem',
+                    lineHeight: '1.25rem',
+                    transition: 'color 0.2s, background 0.2s',
+                    display: 'flex',
+                    cursor: 'pointer',
+                  }}
+                  onMouseEnter={e => {
+                    const icon = e.currentTarget.querySelector('.material-symbols-outlined');
+                    if (icon instanceof HTMLElement) {
+                      icon.style.color = themeMode === 'dark' ? '#fff' : '#000';
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    const icon = e.currentTarget.querySelector('.material-symbols-outlined');
+                    if (icon instanceof HTMLElement) {
+                      icon.style.color = themeMode === 'dark' ? '#000' : '#fff';
+                    }
+                  }}
+                  title="Delete"
+                  onClick={handleDelete}
+                  aria-label="Delete"
+                >
+                  <span
+                    className="material-symbols-outlined"
+                    style={{
+                      fontSize: '1.25rem',
+                      verticalAlign: 'middle',
+                      color: themeMode === 'dark' ? '#000' : '#fff', // dark: black, light: white
+                      lineHeight: 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24",
+                      transition: 'color 0.2s',
+                    }}
+                  >
+                    delete
+                  </span>
+                </button>
+              )}
             </div>
             {/* Color header section */}
             <div
@@ -342,37 +415,6 @@ export const EventModal: React.FC<EventModalProps> = ({
                   borderColor: inputRef.current && document.activeElement === inputRef.current ? getColorHex() : borderSectionColor,
                   borderWidth: '1px',
                   borderStyle: 'solid'
-                }}
-                onFocus={e => {
-                  e.currentTarget.style.color = themeMode === 'dark' ? '#fff' : '#000';
-                  e.currentTarget.style.borderColor = getColorHex();
-                }}
-                onBlur={e => {
-                  e.currentTarget.style.color = themeMode === 'dark' ? '#b0b3b8' : '#8a8a8a';
-                  e.currentTarget.style.borderColor = borderSectionColor;
-                }}
-              />
-            </div>
-            {/* Description section (no label, 10 lines, fills modal) */}
-            <div className="px-4 py-4 flex flex-col gap-1">
-              <textarea
-                id="event-description-input"
-                placeholder="Description"
-                rows={10}
-                className="rounded px-2 py-1 text-sm outline-none border transition-colors bg-transparent resize-none custom-scrollbar"
-                style={{
-                  color: themeMode === 'dark' ? '#b0b3b8' : '#8a8a8a',
-                  backgroundColor: 'transparent',
-                  fontSize: '0.875rem',
-                  lineHeight: '1.25rem',
-                  fontWeight: 400,
-                  borderColor: document.activeElement && document.activeElement.id === 'event-description-input' ? getColorHex() : borderSectionColor,
-                  borderWidth: '1px',
-                  borderStyle: 'solid',
-                  minHeight: '12.5rem',
-                  maxHeight: 'none',
-                  height: '12.5rem',
-                  resize: 'none',
                 }}
                 onFocus={e => {
                   e.currentTarget.style.color = themeMode === 'dark' ? '#fff' : '#000';

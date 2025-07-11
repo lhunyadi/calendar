@@ -56,6 +56,7 @@ export const Calendar: React.FC = () => {
 
   const handleDateDoubleClick = (date: Date) => {
     setModalDate(date)
+    setEditingEvent(null)
     setIsModalOpen(true)
   }
 
@@ -90,6 +91,14 @@ export const Calendar: React.FC = () => {
         ]
       }
     })
+    setEditingEvent(null)
+    setIsModalOpen(false)
+    setModalDate(null)
+  }
+
+  // Delete event by id
+  const handleEventDelete = (eventId: number) => {
+    setEvents(prev => prev.filter(ev => ev.id !== eventId))
     setEditingEvent(null)
     setIsModalOpen(false)
     setModalDate(null)
@@ -135,6 +144,7 @@ export const Calendar: React.FC = () => {
         selectedDate={modalDate}
         onSave={handleEventSave}
         editingEvent={editingEvent} // <-- pass this prop
+        onDelete={handleEventDelete} // <-- pass delete handler
       />
     </div>
   )

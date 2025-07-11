@@ -23,7 +23,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   const searchButtonRef = useRef<HTMLButtonElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const paletteButtonRef = useRef<HTMLButtonElement>(null)
-  const { getColorHex, themeMode, toggleTheme, getTextColor, getBgColor, getSurfaceColor } = useTheme()
+  const { getColorHex, themeMode, toggleTheme, getTextColor, getBgColor, getSurfaceColor, getTodayTextColor } = useTheme()
 
   // Focus input when menu opens
   useEffect(() => {
@@ -238,11 +238,21 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
         <div className="flex items-center space-x-2">
           <button
             onClick={onToday}
-            className={`
-              px-3 py-1 rounded text-sm
-              transition-colors
-              ${themeMode === 'dark' ? 'bg-brand-blue text-brand-white hover:bg-brand-blue/90 hover:text-brand-black' : 'bg-brand-blue text-brand-black hover:bg-brand-blue/90 hover:text-brand-white'}
-            `}
+            className="px-3 py-1 rounded text-sm transition-colors"
+            style={{
+              backgroundColor: getColorHex(),
+              color: getTodayTextColor(),
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.backgroundColor = getColorHex() + 'DD';
+              e.currentTarget.style.color = getTextColor();
+              e.currentTarget.style.transition = 'background-color 0.2s, color 0.2s';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.backgroundColor = getColorHex();
+              e.currentTarget.style.color = getTodayTextColor();
+              e.currentTarget.style.transition = 'background-color 0.2s, color 0.2s';
+            }}
           >
             Today
           </button>
