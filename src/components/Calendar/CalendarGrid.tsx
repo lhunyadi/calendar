@@ -29,13 +29,8 @@ interface CalendarGridProps {
   onDateClick: (date: Date) => void
   onDayHeaderClick: (date: Date) => void
   onDateDoubleClick?: (date: Date) => void
-  onEventClick?: (event: Event) => void; // <-- add this
+  onEventClick?: (event: Event) => void;
 }
-
-// Utility filter functions to avoid deep nesting
-const filterOutEventById = (events: Event[], id: number) => events.filter(ev => ev.id !== id);
-const filterEventsByDay = (events: Event[], day: Date) => events.filter(ev => isSameDay(ev.date, day));
-const filterEventsNotByDay = (events: Event[], day: Date) => events.filter(ev => !isSameDay(ev.date, day));
 
 export const CalendarGrid: React.FC<CalendarGridProps> = ({
   currentDate,
@@ -59,11 +54,11 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
     const dateFormat = 'EEEE'
     const days = []
     let startDate = startOfWeek(startOfMonth(currentDate))
-    const todayDayOfWeek = new Date().getDay() // Get today's day of the week (0-6)
+    const todayDayOfWeek = new Date().getDay()
 
     for (let i = 0; i < 7; i++) {
       const dayDate = addDays(startDate, i)
-      const isTodayDayOfWeek = dayDate.getDay() === todayDayOfWeek // Check if this day of week matches today's day of week
+      const isTodayDayOfWeek = dayDate.getDay() === todayDayOfWeek
       const isSelectedColumn = selectedColumn !== null && dayDate.getDay() === selectedColumn
       
       const currentColor = getColorHex()
@@ -75,20 +70,20 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
             isSelectedColumn ? 'border-t-2' : ''
           }`}
           style={{
-            color: isTodayDayOfWeek ? currentColor : getTextColor(), // Use dynamic text color for non-today headers
+            color: isTodayDayOfWeek ? currentColor : getTextColor(),
             borderTopColor: isSelectedColumn ? currentColor : undefined,
-            backgroundColor: getBgColor() // Use same color as date header
+            backgroundColor: getBgColor()
           }}
           onClick={() => onDayHeaderClick(dayDate)}
           onMouseEnter={(e) => {
             const target = e.currentTarget as HTMLElement
-            target.style.backgroundColor = getHoverColor() // Use transparent brand color
-            target.style.transition = 'background-color 0.2s ease' // Only transition on hover
+            target.style.backgroundColor = getHoverColor()
+            target.style.transition = 'background-color 0.2s ease'
           }}
           onMouseLeave={(e) => {
             const target = e.currentTarget as HTMLElement
-            target.style.backgroundColor = getBgColor() // Reset to date header color
-            target.style.transition = 'background-color 0.2s ease' // Only transition on hover
+            target.style.backgroundColor = getBgColor()
+            target.style.transition = 'background-color 0.2s ease'
           }}
         >
           {format(dayDate, dateFormat)}
@@ -206,7 +201,6 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
     <div
       className="flex flex-col h-full w-full text-left"
       aria-label="Drop event here"
-      tabIndex={0}
     >
       <div className="p-1">
         <span
@@ -331,9 +325,6 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
             }}
             onDragOver={e => {
               e.preventDefault();
-              if (draggedEventId !== null && dragOverEventId === null) {
-                // Optionally, you could add a visual indicator here
-              }
             }}
             onDrop={e => {
               e.preventDefault();

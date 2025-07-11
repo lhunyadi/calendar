@@ -13,7 +13,6 @@ export const ColorPalette: React.FC<ColorPaletteProps> = ({ isOpen, onClose, pal
   const [visibleColors, setVisibleColors] = useState<number>(0)
   const [mounted, setMounted] = useState<boolean>(false)
 
-  // Show method: mount and animate
   const show = useCallback(() => {
     setMounted(true)
     setVisibleColors(0)
@@ -32,7 +31,6 @@ export const ColorPalette: React.FC<ColorPaletteProps> = ({ isOpen, onClose, pal
     return () => clearTimeout(timer)
   }, [colorOptions])
 
-  // Hide method: unmount and reset
   const hide = useCallback(() => {
     setVisibleColors(0)
     setMounted(false)
@@ -40,13 +38,11 @@ export const ColorPalette: React.FC<ColorPaletteProps> = ({ isOpen, onClose, pal
 
   // Effect to handle open/close logic
   useEffect(() => {
-    // Provide multiple methods to control palette, not just isOpen
     if (isOpen) {
       show()
     } else if (!isOpen && mounted) {
       hide()
     }
-    // Also allow manual show/hide via keyboard (for accessibility)
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && mounted) {
         hide()
@@ -62,7 +58,6 @@ export const ColorPalette: React.FC<ColorPaletteProps> = ({ isOpen, onClose, pal
     }
   }, [isOpen, show, hide, mounted, onClose])
 
-  // Effect for click outside
   useEffect(() => {
     if (!mounted) return
     const handleClickOutside = (event: MouseEvent) => {

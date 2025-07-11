@@ -7,7 +7,7 @@ interface EventModalProps {
   selectedDate: Date | null
   onSave: (event: { name: string; color: string; priority: number; date: Date }) => void;
   editingEvent?: { name: string; color: string; priority: number; id: number } | null;
-  onDelete?: (eventId: number) => void; // <-- add this prop
+  onDelete?: (eventId: number) => void;
 }
 
 export const EventModal: React.FC<EventModalProps> = ({
@@ -16,19 +16,15 @@ export const EventModal: React.FC<EventModalProps> = ({
   selectedDate,
   onSave,
   editingEvent,
-  onDelete, // <-- add this
+  onDelete,
 }) => {
   const [eventName, setEventName] = React.useState("");
   const { getBgColor, getTextColor, getColorHex, getSurfaceColor, themeMode } = useTheme();
-  // Use the current highlight color from the calendar as the default
   const highlightColor = getColorHex();
   const [selectedColor, setSelectedColor] = React.useState<string>(highlightColor);
-  // Priority: 0 = Low, 1 = Medium, 2 = High, -1 = none
-  const [selectedPriority, setSelectedPriority] = React.useState<number>(-1);
-
+  const [selectedPriority, setSelectedPriority] = React.useState<number>(-1);  // Priority: 0 = Low, 1 = Medium, 2 = High, -1 = none
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // Hide scrollbar for description textarea
   useEffect(() => {
     if (!isOpen) return;
     const styleId = 'custom-scrollbar-style';
@@ -49,20 +45,23 @@ export const EventModal: React.FC<EventModalProps> = ({
     }
   }, [isOpen])
 
-  // Reset eventName and selectedColor when modal closes
+
   useEffect(() => {
     if (isOpen && editingEvent) {
       setEventName(editingEvent.name);
       setSelectedColor(editingEvent.color);
       setSelectedPriority(editingEvent.priority);
-    } else if (isOpen && !editingEvent) {
+    }
+  }, [isOpen, editingEvent]);
+
+  useEffect(() => {
+    if (isOpen && !editingEvent) {
       setEventName("");
       setSelectedColor(highlightColor);
       setSelectedPriority(-1);
     }
   }, [isOpen, editingEvent, highlightColor]);
 
-  // Escape closes modal: listen on document when open
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -97,7 +96,6 @@ export const EventModal: React.FC<EventModalProps> = ({
     }
   };
 
-  // Extracted theme-dependent values for SonarQube compliance
   const borderSectionColor = themeMode === 'dark' ? '#2C2D30' : '#e6e6e6';
   const selectedBorderColor = themeMode === 'dark' ? '#fff' : '#000';
 
@@ -246,7 +244,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                 <button
                   className="flex items-center justify-center rounded shadow text-sm px-3 py-1"
                   style={{
-                    backgroundColor: '#fe2b29', // Always red, regardless of theme
+                    backgroundColor: '#fe2b29',
                     border: 'none',
                     outline: 'none',
                     height: '2.25rem',
@@ -278,7 +276,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                     style={{
                       fontSize: '1.25rem',
                       verticalAlign: 'middle',
-                      color: themeMode === 'dark' ? '#000' : '#fff', // dark: black, light: white
+                      color: themeMode === 'dark' ? '#000' : '#fff',
                       lineHeight: 1,
                       display: 'flex',
                       alignItems: 'center',
@@ -310,14 +308,13 @@ export const EventModal: React.FC<EventModalProps> = ({
                 paddingBottom: '1rem',
               }}
             >
-              {/* Color circles with highlight effect matching ColorPalette */}
+              {/* Color circles with highlight effect*/}
               {[
                 { color: '#36C5F0', label: 'Blue' },
                 { color: '#2EB67D', label: 'Green' },
                 { color: '#ECB22E', label: 'Yellow' },
                 { color: '#E01E5A', label: 'Red' },
               ].map(({ color, label }) => {
-                // Brand-white in dark, brand-black in light
                 const ringColor = themeMode === 'dark' ? '#ffffff' : '#000000';
                 const isSelected = selectedColor === color;
                 return (
@@ -345,7 +342,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                 );
               })}
             </div>
-            {/* Empty header section between Color and Name, visually separated only by the same grey line as other modal sections */}
+            {/* Priority header */}
             <div
               className="flex items-center gap-2 px-4"
               style={{
@@ -363,7 +360,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                 paddingBottom: '1rem',
               }}
             >
-              {/* 3 rectangles visually separated, now as buttons with theme-aware outline */}
+              {/* Priority buttons */}
               {["Low", "Medium", "High"].map((label, idx) => {
                 const background = getPriorityBackground(idx);
                 const isSelected = selectedPriority === idx;
@@ -394,7 +391,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                 );
               })}
             </div>
-            {/* Name section */}
+            {/* Name header */}
             <div className="px-4 py-4 flex flex-col gap-1"
                  style={{ borderBottom: `1px solid ${borderSectionColor}` }}>
               <input

@@ -12,14 +12,12 @@ interface ThemeContextType {
   getColorHex: () => string
   themeMode: ThemeMode
   toggleTheme: () => void
-  // Dynamic color functions
   getTextColor: () => string
   getBgColor: () => string
   getSurfaceColor: () => string
   getTextColorClass: () => string
   getBgColorClass: () => string
   getSurfaceColorClass: () => string
-  // Calendar-specific colors
   getCalendarInMonthColor: () => string
   getCalendarOutMonthColor: () => string
   getHoverColor: () => string
@@ -33,8 +31,8 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const [currentColor, setCurrentColor] = useState<BrandColor>('brand-blue') // Default to blue
-  const [themeMode, setThemeMode] = useState<ThemeMode>('dark') // Default to dark mode
+  const [currentColor, setCurrentColor] = useState<BrandColor>('brand-blue') 
+  const [themeMode, setThemeMode] = useState<ThemeMode>('dark')
 
   const colorOptions: BrandColor[] = [
     'brand-blue',
@@ -44,30 +42,22 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   ]
 
   const toggleTheme = () => {
-    // Temporarily disable all transitions for instant theme change
     document.body.classList.add('theme-changing')
-    
-    // Use flushSync to ensure all components update simultaneously
     flushSync(() => {
       setThemeMode(prev => prev === 'dark' ? 'light' : 'dark')
     })
-    
-    // Re-enable transitions after a frame
     requestAnimationFrame(() => {
       document.body.classList.remove('theme-changing')
     })
   }
 
   const setCurrentColorSync = (color: BrandColor) => {
-    // Temporarily disable all transitions for instant color change
     document.body.classList.add('theme-changing')
     
-    // Use flushSync to ensure all components update simultaneously when color changes
     flushSync(() => {
       setCurrentColor(color)
     })
     
-    // Re-enable transitions after a frame
     requestAnimationFrame(() => {
       document.body.classList.remove('theme-changing')
     })
@@ -85,15 +75,15 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   // Dynamic color functions that swap based on theme mode
   const getTextColor = (): string => {
-    return themeMode === 'dark' ? '#ffffff' : '#000000' // white : black
+    return themeMode === 'dark' ? '#ffffff' : '#000000'
   }
 
   const getBgColor = (): string => {
-    return themeMode === 'dark' ? '#1A1D21' : '#ffffff' // brand-dark : pure white
+    return themeMode === 'dark' ? '#1A1D21' : '#ffffff'
   }
 
   const getSurfaceColor = (): string => {
-    return themeMode === 'dark' ? '#222529' : '#fafafa' // brand-medium : brand-light
+    return themeMode === 'dark' ? '#222529' : '#fafafa'
   }
 
   const getTextColorClass = (): string => {
@@ -108,33 +98,25 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     return themeMode === 'dark' ? 'bg-brand-medium' : 'bg-brand-light'
   }
 
-  // Calendar-specific color functions
   const getCalendarInMonthColor = (): string => {
-    return themeMode === 'dark' ? '#1A1D21' : '#ffffff' // brand-dark : pure white
+    return themeMode === 'dark' ? '#1A1D21' : '#ffffff'
   }
 
   const getCalendarOutMonthColor = (): string => {
-    return themeMode === 'dark' ? '#222529' : '#fafafa' // brand-medium : brand-light
+    return themeMode === 'dark' ? '#222529' : '#fafafa'
   }
 
-  // Hover color function that calculates the exact resulting color to match across themes
   const getHoverColor = (): string => {
-    const brandColor = getColorHex()
+  const brandColor = getColorHex()
     
-    // For dark mode, we want the nice light teal effect (brand color over dark background)
-    // For light mode, we calculate what solid color would give the same visual result
+
     if (themeMode === 'dark') {
-      // Use transparency on dark background (original behavior)
-      return `${brandColor}40` // 25% opacity over dark background
+      return `${brandColor}40`
     } else {
-      // Calculate the exact RGB that would result from 25% brand color over white
-      // This gives us the same visual color as the dark mode hover, but as a solid color
       const hex = brandColor.replace('#', '')
       const r = parseInt(hex.slice(0, 2), 16)
       const g = parseInt(hex.slice(2, 4), 16)
       const b = parseInt(hex.slice(4, 6), 16)
-      
-      // Blend 25% brand color with 75% white (255,255,255)
       const blendedR = Math.round(r * 0.25 + 255 * 0.75)
       const blendedG = Math.round(g * 0.25 + 255 * 0.75)
       const blendedB = Math.round(b * 0.25 + 255 * 0.75)
@@ -143,14 +125,13 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     }
   }
 
-  // Get contrasting text color for today highlights - opposite of theme
   const getTodayTextColor = (): string => {
-    return themeMode === 'dark' ? '#1A1D21' : '#ffffff' // brand-black : brand-white
+    return themeMode === 'dark' ? '#1A1D21' : '#ffffff'
   }
 
   const value = useMemo(() => ({
     currentColor,
-    setCurrentColor: setCurrentColorSync, // Use the synchronous version
+    setCurrentColor: setCurrentColorSync,
     colorOptions,
     getColorHex,
     themeMode,

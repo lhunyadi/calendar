@@ -50,11 +50,10 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   }, [isSearchOpen])
 
   const getButtonIconColor = (): string => {
-    return themeMode === 'dark' ? '#ffffff' : '#000000' // white in dark mode, black in light mode
+    return themeMode === 'dark' ? '#ffffff' : '#000000'
   }
 
   const getDisplayTitle = () => {
-    // Always show Month Year format
     const monthName = format(currentDate, 'MMMM')
     const year = format(currentDate, 'yyyy')
     return { monthName, year }
@@ -62,7 +61,6 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 
   const renderTitle = () => {
     const title = getDisplayTitle()
-    // Month in highlight color, year in primary text color
     return (
       <>
         <span style={{ color: getColorHex() }}>{title.monthName}</span>
@@ -88,7 +86,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
               className="absolute left-0 z-20 flex items-center px-2 py-2 rounded-l-full rounded-r-full"
               style={{
                 minWidth: '200px',
-                marginLeft: '-200px', // reduced from -220px to move closer to the icon
+                marginLeft: '-200px',
                 backgroundColor: getSurfaceColor(),
                 transition: 'box-shadow 0.2s',
               }}
@@ -153,7 +151,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
               search
             </span>
           </button>
-          {/* Color Palette (should appear to the right of the search button) */}
+          {/* Color Palette */}
           {isPaletteOpen && (
             <ColorPalette 
               isOpen={isPaletteOpen} 
@@ -266,13 +264,13 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
               style={{ color: getTextColor() }}
               onMouseEnter={(e) => {
                 const target = e.currentTarget as HTMLElement
-                target.style.backgroundColor = getColorHex() // Use exact highlight color for hover
-                target.style.transition = 'background-color 0.2s ease' // Only transition on hover
+                target.style.backgroundColor = getColorHex()
+                target.style.transition = 'background-color 0.2s ease'
               }}
               onMouseLeave={(e) => {
                 const target = e.currentTarget as HTMLElement
                 target.style.backgroundColor = 'transparent'
-                target.style.transition = 'background-color 0.2s ease' // Only transition on hover
+                target.style.transition = 'background-color 0.2s ease'
               }}
             >
               <ChevronLeftIcon size={18} />
@@ -283,13 +281,13 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
               style={{ color: getTextColor() }}
               onMouseEnter={(e) => {
                 const target = e.currentTarget as HTMLElement
-                target.style.backgroundColor = getColorHex() // Use exact highlight color for hover
-                target.style.transition = 'background-color 0.2s ease' // Only transition on hover
+                target.style.backgroundColor = getColorHex() 
+                target.style.transition = 'background-color 0.2s ease'
               }}
               onMouseLeave={(e) => {
                 const target = e.currentTarget as HTMLElement
                 target.style.backgroundColor = 'transparent'
-                target.style.transition = 'background-color 0.2s ease' // Only transition on hover
+                target.style.transition = 'background-color 0.2s ease'
               }}
             >
               <ChevronRightIcon size={18} />

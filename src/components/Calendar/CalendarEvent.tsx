@@ -20,7 +20,7 @@ interface CalendarEventProps {
   isDragOver?: boolean;
   dragOverPosition?: 'above' | 'below' | null;
   isDragging?: boolean;
-  onClick?: () => void; // <-- add this
+  onClick?: () => void;
 }
 
 export const CalendarEvent: React.FC<CalendarEventProps> = ({
@@ -34,11 +34,10 @@ export const CalendarEvent: React.FC<CalendarEventProps> = ({
   isDragOver,
   dragOverPosition,
   isDragging,
-  onClick, // <-- add this
+  onClick,
 }) => {
   const { getColorHex, getBgColor, themeMode } = useTheme();
 
-  // Extracted background assignment for SonarQube S3358
   let background: string;
   if (event.priority === 1) {
     background = `repeating-linear-gradient(135deg, ${event.color}33 0 8px, transparent 8px 16px), ${getBgColor()}`;
@@ -48,10 +47,8 @@ export const CalendarEvent: React.FC<CalendarEventProps> = ({
     background = getBgColor();
   }
 
-  // Highlight color for drag-over
   const highlightColor = getColorHex();
 
-  // Dynamic border style for drag-over indicator
   const borderTop =
     isDragOver && dragOverPosition === 'above'
       ? `1px solid ${highlightColor}`
@@ -78,7 +75,7 @@ export const CalendarEvent: React.FC<CalendarEventProps> = ({
         opacity: isDragging ? 0.5 : 1,
         zIndex: isDragging ? 10 : undefined,
         transition: 'border-color 0.15s',
-        overflow: 'hidden', // ensure overlay stays inside
+        overflow: 'hidden',
       }}
       draggable={draggable}
       onDragStart={onDragStart}
@@ -91,7 +88,6 @@ export const CalendarEvent: React.FC<CalendarEventProps> = ({
       onKeyDown={e => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          // Example: open event details or start editing
         }
       }}
       onClick={onClick}
@@ -104,7 +100,6 @@ export const CalendarEvent: React.FC<CalendarEventProps> = ({
             themeMode === 'dark'
               ? 'rgba(255,255,255,0.08)'
               : 'rgba(0,0,0,0.06)',
-          // Slightly brighter for dark, slightly darker for light
         }}
       />
       <span className="relative z-10 w-full truncate">{event.name}</span>

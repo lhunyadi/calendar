@@ -1,6 +1,3 @@
-// Simple wrapper around date-fns functions to avoid importing in multiple files
-// In a real project, we would use date-fns directly
-
 export const addDays = (date: Date, amount: number): Date => {
   const result = new Date(date)
   result.setDate(result.getDate() + amount)
@@ -113,8 +110,8 @@ export const format = (date: Date, formatStr: string): string => {
 }
 
 export const getWeekRange = (date: Date, isWorkWeek: boolean = false): string => {
-  const start = isWorkWeek ? addDays(startOfWeek(date), 1) : startOfWeek(date) // Monday for work week
-  const end = isWorkWeek ? addDays(start, 4) : addDays(start, 6) // Friday for work week, Saturday for full week
+  const start = isWorkWeek ? addDays(startOfWeek(date), 1) : startOfWeek(date)
+  const end = isWorkWeek ? addDays(start, 4) : addDays(start, 6)
   
   const startMonth = format(start, 'MMMM yyyy').split(' ')[0]
   const endMonth = format(end, 'MMMM yyyy').split(' ')[0]

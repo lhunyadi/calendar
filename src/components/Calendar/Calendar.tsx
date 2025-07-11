@@ -4,7 +4,6 @@ import { CalendarGrid } from './CalendarGrid'
 import { EventModal } from '../shared/EventModal'
 import { addMonths, subMonths } from '../../utils/dateUtils'
 
-// Updated Event type to include priority
 interface Event {
   id: number
   name: string
@@ -18,8 +17,6 @@ export const Calendar: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date())
   const [selectedColumn, setSelectedColumn] = useState<number | null>(null)
   const [events, setEvents] = useState<Event[]>([])
-
-  // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalDate, setModalDate] = useState<Date | null>(null)
   const [editingEvent, setEditingEvent] = useState<Event | null>(null)
@@ -133,7 +130,7 @@ export const Calendar: React.FC = () => {
           onDateClick={handleDateClick}
           onDayHeaderClick={handleDayHeaderClick}
           onDateDoubleClick={handleDateDoubleClick}
-          onEventClick={handleEventClick} // <-- pass this prop
+          onEventClick={handleEventClick}
         />
       </div>
 
@@ -143,8 +140,8 @@ export const Calendar: React.FC = () => {
         onClose={handleModalClose}
         selectedDate={modalDate}
         onSave={handleEventSave}
-        editingEvent={editingEvent} // <-- pass this prop
-        onDelete={handleEventDelete} // <-- pass delete handler
+        editingEvent={editingEvent}
+        onDelete={handleEventDelete}
       />
     </div>
   )
