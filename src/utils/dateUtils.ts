@@ -112,7 +112,6 @@ export const format = (date: Date, formatStr: string): string => {
 export const getWeekRange = (date: Date, isWorkWeek: boolean = false): string => {
   const start = isWorkWeek ? addDays(startOfWeek(date), 1) : startOfWeek(date)
   const end = isWorkWeek ? addDays(start, 4) : addDays(start, 6)
-  
   const startMonth = format(start, 'MMMM yyyy').split(' ')[0]
   const endMonth = format(end, 'MMMM yyyy').split(' ')[0]
   const year = format(end, 'MMMM yyyy').split(' ')[1]
