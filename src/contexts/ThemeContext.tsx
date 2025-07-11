@@ -5,7 +5,7 @@ import type { ReactNode } from 'react'
 export type BrandColor = 'brand-blue' | 'brand-yellow' | 'brand-green' | 'brand-red'
 export type ThemeMode = 'dark' | 'light'
 
-interface ThemeContextType {
+export interface ThemeContextType {
   currentColor: BrandColor
   setCurrentColor: (color: BrandColor) => void
   colorOptions: BrandColor[]
@@ -146,7 +146,24 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     getCalendarOutMonthColor,
     getHoverColor,
     getTodayTextColor
-  }), [currentColor, themeMode])
+  }), [
+    currentColor,
+    setCurrentColorSync,
+    colorOptions,
+    getColorHex,
+    themeMode,
+    toggleTheme,
+    getTextColor,
+    getBgColor,
+    getSurfaceColor,
+    getTextColorClass,
+    getBgColorClass,
+    getSurfaceColorClass,
+    getCalendarInMonthColor,
+    getCalendarOutMonthColor,
+    getHoverColor,
+    getTodayTextColor
+  ])
 
   return (
     <ThemeContext.Provider value={value}>

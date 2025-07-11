@@ -306,7 +306,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
   const renderCells = () => {
     const monthStart = startOfMonth(currentDate)
     const monthEnd = endOfMonth(monthStart)
-    const startDate = startOfWeek(monthStart)
+    const startDate = startOfWeek(startOfMonth(currentDate))
     const endDate = endOfWeek(monthEnd)
     const currentColor = getColorHex()
 

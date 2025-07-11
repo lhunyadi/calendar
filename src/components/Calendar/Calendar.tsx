@@ -14,7 +14,15 @@ interface Event {
   isHoliday?: boolean;
 }
 
-function mapHolidayToEvent(h: any, code: string, getColorHex: () => string): Event {
+interface HolidayApi {
+  date: string;
+  localName: string;
+}
+interface CountryApi {
+  countryCode: string;
+}
+
+function mapHolidayToEvent(h: HolidayApi, code: string, getColorHex: () => string): Event {
   return {
     id: `holiday-${code}-${h.date}`,
     name: `${h.localName} (${code})`,
@@ -31,8 +39,8 @@ async function fetchCountryHolidays(
   getColorHex: () => string
 ): Promise<Event[]> {
   const res = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/${code}`);
-  const data = await res.json();
-  return data.map((h: any) => mapHolidayToEvent(h, code, getColorHex));
+  const data: HolidayApi[] = await res.json();
+  return data.map((h) => mapHolidayToEvent(h, code, getColorHex));
 }
 
 export const Calendar: React.FC = () => {
@@ -51,8 +59,8 @@ export const Calendar: React.FC = () => {
     const fetchHolidays = async () => {
       const year = currentDate.getFullYear();
       const countriesRes = await fetch('https://date.nager.at/api/v3/AvailableCountries');
-      const countries = await countriesRes.json();
-      const countryCodes: string[] = countries.slice(0, 10).map((c: any) => c.countryCode);
+      const countries: CountryApi[] = await countriesRes.json();
+      const countryCodes: string[] = countries.slice(0, 10).map((c) => c.countryCode);
       const allHolidaysArrays = await Promise.all(
         countryCodes.map((code: string) => fetchCountryHolidays(code, year, getColorHex))
       );
