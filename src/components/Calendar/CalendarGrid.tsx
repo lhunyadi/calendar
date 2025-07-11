@@ -13,11 +13,12 @@ import { CalendarEvent } from './CalendarEvent'
 import { useTheme } from '../../contexts/ThemeContext'
 
 interface Event {
-  id: number
-  name: string
-  date: Date
-  color: string
-  priority: number
+  id: string | number;
+  name: string;
+  date: Date;
+  color: string;
+  priority: number;
+  isHoliday?: boolean;
 }
 
 interface CalendarGridProps {
@@ -160,15 +161,15 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
   }
 
   // Drag state
-  const [draggedEventId, setDraggedEventId] = React.useState<number | null>(null)
-  const [dragOverEventId, setDragOverEventId] = React.useState<number | null>(null)
+  const [draggedEventId, setDraggedEventId] = React.useState<string | number | null>(null)
+  const [dragOverEventId, setDragOverEventId] = React.useState<string | number | null>(null)
   const [dragOverPosition, setDragOverPosition] = React.useState<'above' | 'below' | null>(null)
 
   // Move or reorder events
   const moveOrReorderEvents = (
     targetDate: Date,
-    draggedId: number,
-    targetId: number,
+    draggedId: string | number,
+    targetId: string | number,
     position: 'above' | 'below'
   ) => {
     setEvents(prevEvents => {
@@ -223,54 +224,56 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
           minHeight: 0,
         }}
       >
-        {dayEvents.map((event) => (
-          <CalendarEvent
-            key={event.id}
-            event={event}
-            draggable
-            onDragStart={() => setDraggedEventId(event.id)}
-            onDragEnd={() => {
-              setDraggedEventId(null)
-              setDragOverEventId(null)
-              setDragOverPosition(null)
-            }}
-            onDragOver={e => {
-              e.preventDefault();
-              const rect = e.currentTarget.getBoundingClientRect();
-              const offset = e.clientY - rect.top;
-              const position = offset < rect.height / 2 ? 'above' : 'below';
-              setDragOverEventId(event.id);
-              setDragOverPosition(position);
-            }}
-            onDragLeave={() => {
-              setDragOverEventId(null);
-              setDragOverPosition(null);
-            }}
-            onDrop={e => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (
-                draggedEventId !== null &&
-                dragOverEventId === event.id &&
-                draggedEventId !== dragOverEventId
-              ) {
-                moveOrReorderEvents(
-                  day,
-                  draggedEventId,
-                  event.id,
-                  dragOverPosition!
-                );
-              }
-              setDraggedEventId(null);
-              setDragOverEventId(null);
-              setDragOverPosition(null);
-            }}
-            isDragOver={dragOverEventId === event.id}
-            dragOverPosition={dragOverPosition}
-            isDragging={draggedEventId === event.id}
-            onClick={() => onEventClick?.(event)}
-          />
-        ))}
+        {[...dayEvents]
+          .sort((a, b) => (a.isHoliday === b.isHoliday ? 0 : a.isHoliday ? -1 : 1))
+          .map((event) => (
+            <CalendarEvent
+              key={event.id}
+              event={event}
+              draggable={!event.isHoliday}
+              onDragStart={!event.isHoliday ? () => setDraggedEventId(event.id) : undefined}
+              onDragEnd={!event.isHoliday ? () => {
+                setDraggedEventId(null)
+                setDragOverEventId(null)
+                setDragOverPosition(null)
+              } : undefined}
+              onDragOver={!event.isHoliday ? e => {
+                e.preventDefault();
+                const rect = e.currentTarget.getBoundingClientRect();
+                const offset = e.clientY - rect.top;
+                const position = offset < rect.height / 2 ? 'above' : 'below';
+                setDragOverEventId(event.id);
+                setDragOverPosition(position);
+              } : undefined}
+              onDragLeave={!event.isHoliday ? () => {
+                setDragOverEventId(null);
+                setDragOverPosition(null);
+              } : undefined}
+              onDrop={!event.isHoliday ? e => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (
+                  draggedEventId !== null &&
+                  dragOverEventId === event.id &&
+                  draggedEventId !== dragOverEventId
+                ) {
+                  moveOrReorderEvents(
+                    day,
+                    draggedEventId,
+                    event.id,
+                    dragOverPosition!
+                  );
+                }
+                setDraggedEventId(null);
+                setDragOverEventId(null);
+                setDragOverPosition(null);
+              } : undefined}
+              isDragOver={dragOverEventId === event.id}
+              dragOverPosition={dragOverPosition}
+              isDragging={draggedEventId === event.id}
+              onClick={!event.isHoliday ? () => onEventClick?.(event) : undefined}
+            />
+          ))}
       </div>
     </div>
   );

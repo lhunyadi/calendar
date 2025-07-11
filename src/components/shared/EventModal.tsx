@@ -6,8 +6,8 @@ interface EventModalProps {
   onClose: () => void
   selectedDate: Date | null
   onSave: (event: { name: string; color: string; priority: number; date: Date }) => void;
-  editingEvent?: { name: string; color: string; priority: number; id: number } | null;
-  onDelete?: (eventId: number) => void;
+  editingEvent?: { name: string; color: string; priority: number; id: string | number } | null;
+  onDelete?: (eventId: string | number) => void;
 }
 
 export const EventModal: React.FC<EventModalProps> = ({

@@ -2,11 +2,12 @@ import React from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
 
 interface Event {
-  id: number;
+  id: string | number;
   name: string;
   date: Date;
   color: string;
   priority: number;
+  isHoliday?: boolean;
 }
 
 interface CalendarEventProps {
@@ -39,12 +40,61 @@ export const CalendarEvent: React.FC<CalendarEventProps> = ({
   const { getColorHex, getBgColor, themeMode } = useTheme();
 
   let background: string;
-  if (event.priority === 1) {
+  if (event.isHoliday) {
+    background = `repeating-linear-gradient(135deg, ${getColorHex()}33 0 8px, transparent 8px 16px), ${getBgColor()}`;
+  } else if (event.priority === 1) {
     background = `repeating-linear-gradient(135deg, ${event.color}33 0 8px, transparent 8px 16px), ${getBgColor()}`;
   } else if (event.priority === 2) {
     background = `linear-gradient(90deg, ${event.color}33 0%, ${event.color}33 100%), ${getBgColor()}`;
   } else {
     background = getBgColor();
+  }
+
+  const borderColor = event.isHoliday ? getColorHex() : event.color;
+
+  if (event.isHoliday) {
+    // Extract country code in parentheses, e.g. "Christmas (AR)"
+    const match = event.name.match(/^(.*?)(\s\([A-Z]{2,3}\))$/);
+    const holidayName = match ? match[1] : event.name;
+    const countryCode = match ? match[2] : '';
+
+    return (
+      <div
+        className="relative text-xs p-1 rounded truncate flex items-center justify-center w-full box-border font-medium"
+        style={{
+          background: getBgColor(),
+          borderLeft: `1px solid ${getColorHex()}`,
+          borderRight: `1px solid ${getColorHex()}`,
+          borderTop: `1px solid ${getColorHex()}`,
+          borderBottom: `1px solid ${getColorHex()}`,
+          color: getColorHex(),
+          minHeight: '2.2rem',
+          fontWeight: 500,
+          maxWidth: '100%',
+          opacity: 1,
+          zIndex: 20,
+          pointerEvents: 'none',
+          userSelect: 'none',
+          textAlign: 'center',
+        }}
+        aria-label={`Holiday: ${event.name}`}
+        tabIndex={-1}
+      >
+        <span className="relative z-10 w-full truncate">
+          {holidayName}
+          {countryCode && (
+            <span
+              className="ml-1"
+              style={{
+                color: themeMode === 'dark' ? '#fff' : '#000'
+              }}
+            >
+              {countryCode}
+            </span>
+          )}
+        </span>
+      </div>
+    )
   }
 
   const highlightColor = getColorHex();
