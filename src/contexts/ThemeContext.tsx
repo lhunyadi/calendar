@@ -1,13 +1,8 @@
 import React, { createContext, useContext, useState, useMemo } from 'react'
 import { flushSync } from 'react-dom'
-import type { ReactNode } from 'react'
-import type { BrandColor, ThemeMode, ThemeContextType } from './themeTypes'
+import type { BrandColor, ThemeMode, ThemeContextType, ThemeProviderProps } from './themeTypes'
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
-
-interface ThemeProviderProps {
-  children: ReactNode
-}
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [currentColor, setCurrentColor] = useState<BrandColor>('brand-blue') 

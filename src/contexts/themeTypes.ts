@@ -19,3 +19,7 @@ export interface ThemeContextType {
   getHoverColor: () => string
   getTodayTextColor: () => string
 }
+
+export interface ThemeProviderProps {
+  children: React.ReactNode
+}

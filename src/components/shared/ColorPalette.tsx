@@ -1,12 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
 import type { BrandColor } from '../../contexts/themeTypes'
-
-interface ColorPaletteProps {
-  isOpen: boolean
-  onClose: () => void
-  paletteButtonRef?: React.RefObject<HTMLButtonElement | null>
-}
+import type { ColorPaletteProps } from './colorPaletteTypes'
 
 export const ColorPalette: React.FC<ColorPaletteProps> = ({ isOpen, onClose, paletteButtonRef }) => {
   const { currentColor, setCurrentColor, colorOptions, themeMode } = useTheme()
