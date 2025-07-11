@@ -13,16 +13,16 @@
     "datepicker",
     "modern-ui"
   ],
-  "author": "Your Name <your.email@example.com>",
+  "author": "lhunyadi <l.hunyadi@outlook/com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/modern-calendar-app.git"
+    "url": "https://github.com/lhunyadi/calendar.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/modern-calendar-app/issues"
+    "url": "https://github.com/lhunyadi/calendar/issues"
   },
-  "homepage": "https://github.com/yourusername/modern-calendar-app#readme",
+  "homepage": "https://github.com/lhunyadi/calendar#readme",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
