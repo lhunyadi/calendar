@@ -193,6 +193,83 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
     });
   };
 
+  // Extracted sort function for holidays first
+  const sortHolidaysFirst = (a: Event, b: Event) => {
+    if (a.isHoliday === b.isHoliday) return 0;
+    if (a.isHoliday) return -1;
+    return 1;
+  };
+
+  // Extracted event rendering function to reduce cognitive complexity
+  const renderCalendarEvent = (event: Event, day: Date) => {
+    const isHoliday = !!event.isHoliday;
+    const isDragOver = dragOverEventId === event.id;
+    const isDragging = draggedEventId === event.id;
+
+    // Drag handlers only for non-holiday events
+    const dragProps = !isHoliday
+      ? {
+          draggable: true,
+          onDragStart: () => setDraggedEventId(event.id),
+          onDragEnd: () => {
+            setDraggedEventId(null);
+            setDragOverEventId(null);
+            setDragOverPosition(null);
+          },
+          onDragOver: (e: React.DragEvent<HTMLButtonElement>) => {
+            e.preventDefault();
+            const rect = e.currentTarget.getBoundingClientRect();
+            const offset = e.clientY - rect.top;
+            const position = offset < rect.height / 2 ? 'above' : 'below';
+            setDragOverEventId(event.id);
+            setDragOverPosition(position);
+          },
+          onDragLeave: () => {
+            setDragOverEventId(null);
+            setDragOverPosition(null);
+          },
+          onDrop: (e: React.DragEvent<HTMLButtonElement>) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (
+              draggedEventId !== null &&
+              dragOverEventId === event.id &&
+              draggedEventId !== dragOverEventId
+            ) {
+              moveOrReorderEvents(
+                day,
+                draggedEventId,
+                event.id,
+                dragOverPosition!
+              );
+            }
+            setDraggedEventId(null);
+            setDragOverEventId(null);
+            setDragOverPosition(null);
+          },
+        }
+      : {
+          draggable: false,
+          onDragStart: undefined,
+          onDragEnd: undefined,
+          onDragOver: undefined,
+          onDragLeave: undefined,
+          onDrop: undefined,
+        };
+
+    return (
+      <CalendarEvent
+        key={event.id}
+        event={event}
+        {...dragProps}
+        isDragOver={isDragOver}
+        dragOverPosition={dragOverPosition}
+        isDragging={isDragging}
+        onClick={!isHoliday ? () => onEventClick?.(event) : undefined}
+      />
+    );
+  };
+
   const renderDayContent = (
     day: Date,
     formattedDate: string,
@@ -225,55 +302,8 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
         }}
       >
         {[...dayEvents]
-          .sort((a, b) => (a.isHoliday === b.isHoliday ? 0 : a.isHoliday ? -1 : 1))
-          .map((event) => (
-            <CalendarEvent
-              key={event.id}
-              event={event}
-              draggable={!event.isHoliday}
-              onDragStart={!event.isHoliday ? () => setDraggedEventId(event.id) : undefined}
-              onDragEnd={!event.isHoliday ? () => {
-                setDraggedEventId(null)
-                setDragOverEventId(null)
-                setDragOverPosition(null)
-              } : undefined}
-              onDragOver={!event.isHoliday ? e => {
-                e.preventDefault();
-                const rect = e.currentTarget.getBoundingClientRect();
-                const offset = e.clientY - rect.top;
-                const position = offset < rect.height / 2 ? 'above' : 'below';
-                setDragOverEventId(event.id);
-                setDragOverPosition(position);
-              } : undefined}
-              onDragLeave={!event.isHoliday ? () => {
-                setDragOverEventId(null);
-                setDragOverPosition(null);
-              } : undefined}
-              onDrop={!event.isHoliday ? e => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (
-                  draggedEventId !== null &&
-                  dragOverEventId === event.id &&
-                  draggedEventId !== dragOverEventId
-                ) {
-                  moveOrReorderEvents(
-                    day,
-                    draggedEventId,
-                    event.id,
-                    dragOverPosition!
-                  );
-                }
-                setDraggedEventId(null);
-                setDragOverEventId(null);
-                setDragOverPosition(null);
-              } : undefined}
-              isDragOver={dragOverEventId === event.id}
-              dragOverPosition={dragOverPosition}
-              isDragging={draggedEventId === event.id}
-              onClick={!event.isHoliday ? () => onEventClick?.(event) : undefined}
-            />
-          ))}
+          .sort(sortHolidaysFirst)
+          .map(event => renderCalendarEvent(event, day))}
       </div>
     </div>
   );

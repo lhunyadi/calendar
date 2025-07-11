@@ -14,6 +14,27 @@ interface Event {
   isHoliday?: boolean;
 }
 
+function mapHolidayToEvent(h: any, code: string, getColorHex: () => string): Event {
+  return {
+    id: `holiday-${code}-${h.date}`,
+    name: `${h.localName} (${code})`,
+    date: new Date(h.date),
+    color: getColorHex(),
+    priority: 1,
+    isHoliday: true,
+  };
+}
+
+async function fetchCountryHolidays(
+  code: string,
+  year: number,
+  getColorHex: () => string
+): Promise<Event[]> {
+  const res = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/${code}`);
+  const data = await res.json();
+  return data.map((h: any) => mapHolidayToEvent(h, code, getColorHex));
+}
+
 export const Calendar: React.FC = () => {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date())
@@ -23,54 +44,36 @@ export const Calendar: React.FC = () => {
   const [modalDate, setModalDate] = useState<Date | null>(null)
   const [editingEvent, setEditingEvent] = useState<Event | null>(null)
   const [holidays, setHolidays] = useState<Event[]>([])
+  const [searchText, setSearchText] = useState<string>('')
   const { getColorHex } = useTheme()
 
-  // Fetch holidays for all countries for the current year
   useEffect(() => {
     const fetchHolidays = async () => {
-      const year = currentDate.getFullYear()
-      const countriesRes = await fetch('https://date.nager.at/api/v3/AvailableCountries')
-      const countries = await countriesRes.json()
-      // Limit to a reasonable number of countries for performance (e.g., top 10)
-      const countryCodes = countries.slice(0, 10).map((c: any) => c.countryCode)
-      const allHolidays: Event[] = []
-      await Promise.all(
-        countryCodes.map(async (code: string) => {
-          const res = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/${code}`)
-          const data = await res.json()
-          data.forEach((h: any) => {
-            allHolidays.push({
-              id: `holiday-${code}-${h.date}`,
-              name: `${h.localName} (${code})`,
-              date: new Date(h.date),
-              color: getColorHex(),
-              priority: 1,
-              isHoliday: true,
-            })
-          })
-        })
-      )
-      setHolidays(allHolidays)
-    }
-    fetchHolidays()
-    // Re-fetch on highlight color change
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+      const year = currentDate.getFullYear();
+      const countriesRes = await fetch('https://date.nager.at/api/v3/AvailableCountries');
+      const countries = await countriesRes.json();
+      const countryCodes: string[] = countries.slice(0, 10).map((c: any) => c.countryCode);
+      const allHolidaysArrays = await Promise.all(
+        countryCodes.map((code: string) => fetchCountryHolidays(code, year, getColorHex))
+      );
+      const allHolidays = allHolidaysArrays.flat();
+      setHolidays(allHolidays);
+    };
+    fetchHolidays();
   }, [getColorHex, currentDate])
 
-  // Merge holidays and user events, holidays always first per day
+  const normalizeText = (text: string) =>
+    text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
   const mergedEvents = React.useMemo(() => {
-    // Group holidays by date string for fast lookup
-    const holidayMap = new Map<string, Event[]>()
-    holidays.forEach(h => {
-      const key = h.date.toISOString().slice(0, 10)
-      if (!holidayMap.has(key)) holidayMap.set(key, [])
-      holidayMap.get(key)!.push(h)
-    })
-    // For each event, skip if it's a holiday (avoid duplicates)
-    const userEvents = events.filter(ev => !ev.isHoliday)
-    // Return all holidays + user events
-    return [...holidays, ...userEvents]
-  }, [holidays, events])
+    const normalizedSearch = normalizeText(searchText.trim());
+    const filteredUserEvents = events.filter(ev =>
+      ev.isHoliday ||
+      normalizedSearch === '' ||
+      (ev.name && normalizeText(ev.name).includes(normalizedSearch))
+    );
+    return [...holidays, ...filteredUserEvents.filter(ev => !ev.isHoliday)];
+  }, [holidays, events, searchText])
 
   const goToPreviousMonth = () => {
     setCurrentDate(subMonths(currentDate, 1))
@@ -167,6 +170,8 @@ export const Calendar: React.FC = () => {
           onPrevMonth={goToPreviousMonth}
           onNextMonth={goToNextMonth}
           onToday={goToToday}
+          searchText={searchText}
+          setSearchText={setSearchText}
         />
       </div>
 

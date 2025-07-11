@@ -9,6 +9,8 @@ interface CalendarHeaderProps {
   onPrevMonth: () => void
   onNextMonth: () => void
   onToday: () => void
+  searchText?: string
+  setSearchText?: (text: string) => void
 }
 
 export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
@@ -16,24 +18,24 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   onPrevMonth,
   onNextMonth,
   onToday,
+  searchText,
+  setSearchText,
 }) => {
   const [isPaletteOpen, setIsPaletteOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
-  const [searchValue, setSearchValue] = useState('')
+  const [localSearchValue, setLocalSearchValue] = useState('')
   const searchButtonRef = useRef<HTMLButtonElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const paletteButtonRef = useRef<HTMLButtonElement>(null)
   const { getColorHex, themeMode, toggleTheme, getTextColor, getBgColor, getSurfaceColor, getTodayTextColor } = useTheme()
 
-  // Focus input when menu opens
   useEffect(() => {
     if (isSearchOpen && searchInputRef.current) {
       searchInputRef.current.focus();
-      setSearchValue(''); // Clear search box every time it opens
+      setSearchText ? setSearchText('') : setLocalSearchValue(''); // Clear search box every time it opens
     }
-  }, [isSearchOpen])
+  }, [isSearchOpen, setSearchText])
 
-  // Close search menu when clicking outside
   useEffect(() => {
     if (!isSearchOpen) return
     const handleClick = (e: MouseEvent) => {
@@ -69,6 +71,9 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     )
   }
 
+  const value = typeof searchText === 'string' ? searchText : localSearchValue
+  const setValue = setSearchText || setLocalSearchValue
+
   return (
     <div>
       {/* Color Palette Header */}
@@ -94,8 +99,8 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
               <input
                 ref={searchInputRef}
                 type="text"
-                value={searchValue}
-                onChange={e => setSearchValue(e.target.value)}
+                value={value}
+                onChange={e => setValue(e.target.value)}
                 className="bg-transparent outline-none w-full text-sm px-0"
                 style={{
                   color: getTextColor(),
