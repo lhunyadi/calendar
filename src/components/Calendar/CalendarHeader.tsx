@@ -32,7 +32,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   useEffect(() => {
     if (isSearchOpen && searchInputRef.current) {
       searchInputRef.current.focus();
-      setSearchText ? setSearchText('') : setLocalSearchValue(''); // Clear search box every time it opens
+      setSearchText ? setSearchText('') : setLocalSearchValue('');
     }
   }, [isSearchOpen, setSearchText])
 
@@ -50,6 +50,17 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
   }, [isSearchOpen])
+
+  React.useEffect(() => {
+    if (!isSearchOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsSearchOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isSearchOpen]);
 
   const getButtonIconColor = (): string => {
     return themeMode === 'dark' ? '#ffffff' : '#000000'
@@ -76,7 +87,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 
   return (
     <div>
-      {/* Color Palette Header */}
+      {/* Icons Header */}
       <div 
         className="px-4 py-2 flex items-center justify-end border-b relative"
         style={{ 
@@ -115,7 +126,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
               />
             </div>
           )}
-          {/* Search Icon Button */}
+          {/* Search Button */}
           <button
             ref={searchButtonRef}
             type="button"
@@ -156,7 +167,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
               search
             </span>
           </button>
-          {/* Color Palette */}
+          {/* Color Palette Menu*/}
           {isPaletteOpen && (
             <ColorPalette 
               isOpen={isPaletteOpen} 

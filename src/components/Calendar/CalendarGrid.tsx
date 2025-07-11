@@ -160,12 +160,10 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
     return cellClasses
   }
 
-  // Drag state
   const [draggedEventId, setDraggedEventId] = React.useState<string | number | null>(null)
   const [dragOverEventId, setDragOverEventId] = React.useState<string | number | null>(null)
   const [dragOverPosition, setDragOverPosition] = React.useState<'above' | 'below' | null>(null)
 
-  // Move or reorder events
   const moveOrReorderEvents = (
     targetDate: Date,
     draggedId: string | number,
@@ -193,20 +191,17 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
     });
   };
 
-  // Extracted sort function for holidays first
   const sortHolidaysFirst = (a: Event, b: Event) => {
     if (a.isHoliday === b.isHoliday) return 0;
     if (a.isHoliday) return -1;
     return 1;
   };
 
-  // Extracted event rendering function to reduce cognitive complexity
   const renderCalendarEvent = (event: Event, day: Date) => {
     const isHoliday = !!event.isHoliday;
     const isDragOver = dragOverEventId === event.id;
     const isDragging = draggedEventId === event.id;
 
-    // Drag handlers only for non-holiday events
     const dragProps = !isHoliday
       ? {
           draggable: true,

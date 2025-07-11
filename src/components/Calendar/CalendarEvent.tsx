@@ -24,7 +24,6 @@ interface CalendarEventProps {
   onClick?: () => void;
 }
 
-// Helper for holiday rendering
 function renderHolidayEvent(event: Event, getColorHex: () => string, getBgColor: () => string, themeMode: string) {
   const regex = /^(.*?)(\s\([A-Z]{2,3}\))$/;
   const execResult = regex.exec(event.name);
@@ -145,7 +144,7 @@ export const CalendarEvent: React.FC<CalendarEventProps> = ({
       }}
       onClick={onClick}
     >
-      {/* Highlight overlay on hover */}
+      {/* Hover Highlight Overlay*/}
       <span
         className="pointer-events-none absolute inset-0 rounded z-20 opacity-0 group-hover:opacity-100 transition-opacity"
         style={{
