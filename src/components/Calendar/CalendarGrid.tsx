@@ -48,13 +48,13 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
   
   const isWeekend = (date: Date): boolean => {
     const day = date.getDay()
-    return day === 0 || day === 6 // 0 is Sunday, 6 is Saturday
+    return day === 0 || day === 6
   }
 
   const renderDays = () => {
     const dateFormat = 'EEEE'
     const days = []
-    let startDate = startOfWeek(startOfMonth(currentDate))
+    const startDate = startOfWeek(startOfMonth(currentDate))
     const todayDayOfWeek = new Date().getDay()
 
     for (let i = 0; i < 7; i++) {
@@ -360,7 +360,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
                 const draggedEvent = events.find(ev => ev.id === draggedEventId);
                 if (!draggedEvent) return;
                 setEvents(prevEvents => {
-                  let updatedEvents = prevEvents.filter(ev => ev.id !== draggedEventId);
+                  const updatedEvents = prevEvents.filter(ev => ev.id !== draggedEventId);
                   const newEvent = { ...draggedEvent, date: cloneDay };
                   const dayEvents = updatedEvents.filter(ev => isSameDay(ev.date, cloneDay));
                   const otherEvents = updatedEvents.filter(ev => !isSameDay(ev.date, cloneDay));

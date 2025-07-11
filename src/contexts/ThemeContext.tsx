@@ -1,28 +1,7 @@
 import React, { createContext, useContext, useState, useMemo } from 'react'
 import { flushSync } from 'react-dom'
 import type { ReactNode } from 'react'
-
-export type BrandColor = 'brand-blue' | 'brand-yellow' | 'brand-green' | 'brand-red'
-export type ThemeMode = 'dark' | 'light'
-
-export interface ThemeContextType {
-  currentColor: BrandColor
-  setCurrentColor: (color: BrandColor) => void
-  colorOptions: BrandColor[]
-  getColorHex: () => string
-  themeMode: ThemeMode
-  toggleTheme: () => void
-  getTextColor: () => string
-  getBgColor: () => string
-  getSurfaceColor: () => string
-  getTextColorClass: () => string
-  getBgColorClass: () => string
-  getSurfaceColorClass: () => string
-  getCalendarInMonthColor: () => string
-  getCalendarOutMonthColor: () => string
-  getHoverColor: () => string
-  getTodayTextColor: () => string
-}
+import type { BrandColor, ThemeMode, ThemeContextType } from './themeTypes'
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
@@ -53,11 +32,9 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   const setCurrentColorSync = (color: BrandColor) => {
     document.body.classList.add('theme-changing')
-    
     flushSync(() => {
       setCurrentColor(color)
     })
-    
     requestAnimationFrame(() => {
       document.body.classList.remove('theme-changing')
     })
@@ -107,9 +84,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   }
 
   const getHoverColor = (): string => {
-  const brandColor = getColorHex()
-    
-
+    const brandColor = getColorHex()
     if (themeMode === 'dark') {
       return `${brandColor}40`
     } else {
@@ -120,7 +95,6 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       const blendedR = Math.round(r * 0.25 + 255 * 0.75)
       const blendedG = Math.round(g * 0.25 + 255 * 0.75)
       const blendedB = Math.round(b * 0.25 + 255 * 0.75)
-      
       return `#${blendedR.toString(16).padStart(2, '0')}${blendedG.toString(16).padStart(2, '0')}${blendedB.toString(16).padStart(2, '0')}`
     }
   }

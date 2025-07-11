@@ -32,7 +32,11 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   useEffect(() => {
     if (isSearchOpen && searchInputRef.current) {
       searchInputRef.current.focus();
-      setSearchText ? setSearchText('') : setLocalSearchValue('');
+      if (setSearchText) {
+        setSearchText('');
+      } else {
+        setLocalSearchValue('');
+      }
     }
   }, [isSearchOpen, setSearchText])
 

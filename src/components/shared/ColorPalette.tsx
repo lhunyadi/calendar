@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
-import { useTheme, type BrandColor } from '../../contexts/ThemeContext'
+import { useTheme } from '../../contexts/ThemeContext'
+import type { BrandColor } from '../../contexts/themeTypes'
 
 interface ColorPaletteProps {
   isOpen: boolean
